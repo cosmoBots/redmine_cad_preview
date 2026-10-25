@@ -13,6 +13,7 @@ its own license. The license texts are in [licenses/](licenses).
 | [opentype.js](https://opentype.js.org/) | 1.3.4 | MIT | Fonts for texts in DXF drawings | https://github.com/opentypejs/opentype.js |
 | [earcut](https://github.com/mapbox/earcut) | 3.2.4 | ISC | Polygon triangulation in dxf-viewer | https://github.com/mapbox/earcut |
 | [loglevel](https://github.com/pimterry/loglevel) | (in dxf-viewer) | MIT | Logging in dxf-viewer | https://github.com/pimterry/loglevel |
+| [Tabler Icons](https://tabler.io/icons) | 3.49.0 | MIT | Toolbar icons (`assets/images/icons.svg`) | https://github.com/tabler/tabler-icons |
 | [Noto Sans](https://fonts.google.com/noto/specimen/Noto+Sans) | 5.3.0 (Fontsource) | OFL-1.1 | Font for texts in DXF drawings | https://github.com/notofonts/latin-greek-cyrillic |
 
 `assets/javascripts/cad_preview.js` is built from the unmodified packages with

@@ -29,7 +29,26 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     end
     assert_select 'a[data-cad-action=fit]'
     assert_select 'a[data-cad-action=wireframe]'
+    assert_select 'a[data-cad-action=measure-distance]'
+    assert_select 'a[data-cad-action=measure-angle]'
+    assert_select 'a.cad-preview-maximize[data-cad-action=maximize]'
+    assert_select 'a.cad-preview-restore[data-cad-action=maximize]'
+    assert_select 'a.cad-preview-fullscreen[data-cad-action=fullscreen]'
+    assert_select 'a.cad-preview-exit-fullscreen[data-cad-action=fullscreen]'
+    assert_select '.cad-preview-toolbar svg use[href*="plugin_assets/redmine_cad_preview/icons"]', 8
+    assert_select '.cad-preview-info span.cad-preview-dimensions'
     assert_select 'script[type=module][src*=cad_preview]'
+  end
+
+  def test_show_should_include_measurement_labels
+    attachment = create_cad_attachment('model.step')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview[data-i18n]' do |element|
+      i18n = JSON.parse(element.first['data-i18n'])
+      assert_equal %w[angle dimensions distance units], i18n.keys.sort
+      assert_equal 'Distance', i18n['distance']
+    end
   end
 
   def test_show_stl_file_should_not_load_occt
@@ -48,6 +67,8 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
       assert_equal 2, JSON.parse(element.first['data-fonts']).size
     end
     assert_select 'a[data-cad-action=wireframe]', 0
+    assert_select 'a[data-cad-action=measure-distance]'
+    assert_select 'a[data-cad-action=measure-angle]'
   end
 
   def test_show_dwg_file_with_available_converter

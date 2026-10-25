@@ -19,6 +19,8 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **3D preview** – STEP (.step, .stp), IGES (.iges, .igs), BREP (.brep, .brp), STL, OBJ, 3MF, glTF (.gltf, .glb)
 - **2D preview** – DXF, and DWG converted to DXF
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
+- **Measuring** – Overall dimensions of the model or drawing, distance between two points and angle between three points (without snapping). The unit is taken from the file where it is known (STEP, IGES, BREP: mm, glTF: m, DXF: `$INSUNITS`).
+- **Maximize and full screen** – Maximize the viewer to the browser window (remembered in the browser) or switch to full screen
 - **Background conversion of DWG files** – Started after the upload. A failed conversion is attempted at most twice, so opening the preview does not start a new conversion every time.
 - **Settings** – Previewed formats, maximum file size, DWG converter command and timeout
 - **No migration and no additional gems**
@@ -61,6 +63,7 @@ The conversion runs as an Active Job. With the default queue adapter of Redmine,
 - **DWG**: LibreDWG reads older DWG versions well. Newer DWG versions (2018 and later) are only partly supported, e.g. some texts may be missing.
 - **glTF**: `.gltf` files that reference external `.bin` or texture files are not supported. Use `.glb` instead.
 - **Large models**: STEP and IGES files are converted to triangles in the browser. Very large models can take a while and need a lot of memory.
+- **Measuring**: Points are picked on the surface of the model or anywhere in the drawing, without snapping to edges or end points. STL, OBJ and 3MF files have no unit, so measurements are shown in "units".
 - **Autodesk Inventor** (.ipt, .iam) is not supported. Export the model as STEP from Inventor to preview it.
 
 ## 📋 Requirements

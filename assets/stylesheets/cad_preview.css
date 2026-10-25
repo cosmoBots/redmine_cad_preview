@@ -3,7 +3,23 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+  margin-block-end: 4px;
+}
+
+.cad-preview-toolbar a.selected {
+  font-weight: bold;
+}
+
+.cad-preview-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
   margin-block-end: 6px;
+  min-block-size: 1.4em;
+}
+
+.cad-preview-measurement {
+  font-weight: bold;
 }
 
 .cad-preview-hint {
@@ -24,6 +40,10 @@
   display: block;
 }
 
+.cad-preview-measuring .cad-preview-canvas canvas {
+  cursor: crosshair;
+}
+
 .cad-preview-status {
   position: absolute;
   inset: 0;
@@ -40,4 +60,71 @@
 
 .cad-preview-status.cad-preview-error {
   color: #c92a2a;
+}
+
+/* Measurements */
+.cad-preview-overlay {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+
+.cad-preview-overlay .cad-preview-overlay-line {
+  fill: none;
+  stroke: #e8590c;
+  stroke-width: 2;
+}
+
+.cad-preview-overlay circle {
+  fill: #e8590c;
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.cad-preview-overlay text {
+  font-size: 13px;
+  font-weight: bold;
+  fill: #212529;
+  stroke: #fff;
+  stroke-width: 3px;
+  paint-order: stroke;
+}
+
+/* Maximized (fills the browser window) and fullscreen */
+.cad-preview-maximized,
+.cad-preview:fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  background: var(--color-background, #fff);
+}
+
+.cad-preview-maximized .cad-preview-canvas,
+.cad-preview:fullscreen .cad-preview-canvas {
+  flex: 1;
+  block-size: auto;
+  min-block-size: 0;
+}
+
+body.cad-preview-maximized-body {
+  overflow: hidden;
+}
+
+.cad-preview-restore,
+.cad-preview-exit-fullscreen,
+.cad-preview-maximized .cad-preview-maximize,
+.cad-preview:fullscreen .cad-preview-fullscreen,
+.cad-preview:fullscreen .cad-preview-maximize,
+.cad-preview:fullscreen .cad-preview-restore {
+  display: none;
+}
+
+.cad-preview-maximized .cad-preview-restore,
+.cad-preview:fullscreen .cad-preview-exit-fullscreen {
+  display: inline-flex;
 }

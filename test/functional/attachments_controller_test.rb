@@ -24,6 +24,7 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'div.cad-preview[data-cad-preview]' do |element|
       assert_equal 'step', element.first['data-format']
       assert_equal "/cad_previews/#{attachment.id}/file", element.first['data-url']
+      assert_equal 'model.step', element.first['data-filename']
       assert_match %r{/occt-import-js(-\w+)?\.js\z}, element.first['data-occt-script']
       assert_match %r{/occt-import-js(-\w+)?\.wasm\z}, element.first['data-occt-wasm']
     end
@@ -35,7 +36,9 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'a.cad-preview-restore[data-cad-action=maximize]'
     assert_select 'a.cad-preview-fullscreen[data-cad-action=fullscreen]'
     assert_select 'a.cad-preview-exit-fullscreen[data-cad-action=fullscreen]'
-    assert_select '.cad-preview-toolbar svg use[href*="plugin_assets/redmine_cad_preview/icons"]', 8
+    assert_select 'a[data-cad-action=download-png][title=?]', 'Download (PNG)'
+    assert_select 'a[data-cad-action=download-pdf][title=?]', 'Download (PDF)'
+    assert_select '.cad-preview-toolbar svg use[href*="plugin_assets/redmine_cad_preview/icons"]', 10
     assert_select '.cad-preview-info span.cad-preview-dimensions'
     assert_select 'script[type=module][src*=cad_preview]'
   end

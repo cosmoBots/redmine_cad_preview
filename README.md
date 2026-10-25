@@ -20,6 +20,7 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **2D preview** – DXF, and DWG converted to DXF
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
 - **Measuring** – Overall dimensions of the model or drawing, distance between two points and angle between three points (without snapping). The unit is taken from the file where it is known (STEP, IGES, BREP: mm, glTF: m, DXF: `$INSUNITS`).
+- **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library.
 - **Maximize and full screen** – Maximize the viewer to the browser window (remembered in the browser) or switch to full screen
 - **Background conversion of DWG files** – Started after the upload. A failed conversion is attempted at most twice, so opening the preview does not start a new conversion every time.
 - **Settings** – Previewed formats, maximum file size, DWG converter command and timeout

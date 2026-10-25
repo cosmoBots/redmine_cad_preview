@@ -9,6 +9,7 @@
 //   data-fonts        JSON array of font URLs (DXF only)
 //   data-error        Message shown when the file cannot be displayed
 //   data-i18n         JSON object with the labels of the measurements
+//   data-filename     Name of the file, used for the downloaded images
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -28,6 +29,9 @@ const DEFAULT_COLOR = 0x9aa5b1;
 const MAXIMIZED_STORAGE_KEY = 'redmine-cad-preview-maximized';
 // A pointer that moves less than this number of pixels is a click, not a drag
 const CLICK_TOLERANCE = 4;
+const MEASUREMENT_COLOR = '#e8590c';
+// A4 in PDF points, and the margin around the image
+const PDF_PAGE = { long: 842, short: 595, margin: 28 };
 
 let occtPromise = null;
 
@@ -140,9 +144,20 @@ class Measurement {
     return hadPoints;
   }
 
+  // Positions of the points on the canvas and of the label
+  geometry() {
+    const screen = this.points.map((point) => this.viewer.project(point));
+    const text = this.resultText();
+    if (!text) return { screen, text, label: null };
+    const anchor = this.mode === 'angle' ? screen[1] : {
+      x: (screen[0].x + screen[1].x) / 2, y: (screen[0].y + screen[1].y) / 2
+    };
+    return { screen, text, label: { x: anchor.x + 8, y: anchor.y - 8, text: text.replace(/^[^:]*:\s*/, '') } };
+  }
+
   update() {
     this.svg.replaceChildren();
-    const screen = this.points.map((point) => this.viewer.project(point));
+    const { screen, text, label } = this.geometry();
     if (screen.length > 1) {
       this.svg.appendChild(svgElement('polyline', {
         points: screen.map((p) => `${p.x},${p.y}`).join(' '), class: 'cad-preview-overlay-line'
@@ -150,16 +165,43 @@ class Measurement {
     }
     for (const p of screen) this.svg.appendChild(svgElement('circle', { cx: p.x, cy: p.y, r: 4 }));
 
-    const text = this.resultText();
     this.result.textContent = text || '';
-    if (text) {
-      const anchor = this.mode === 'angle' ? screen[1] : {
-        x: (screen[0].x + screen[1].x) / 2, y: (screen[0].y + screen[1].y) / 2
-      };
-      const label = svgElement('text', { x: anchor.x + 8, y: anchor.y - 8 });
-      label.textContent = text.replace(/^[^:]*:\s*/, '');
-      this.svg.appendChild(label);
+    if (label) {
+      const element = svgElement('text', { x: label.x, y: label.y });
+      element.textContent = label.text;
+      this.svg.appendChild(element);
     }
+  }
+
+  // Draws the measurement like the SVG layer, for the downloaded images
+  draw(context) {
+    const { screen, label } = this.geometry();
+    context.save();
+    context.strokeStyle = MEASUREMENT_COLOR;
+    context.lineWidth = 2;
+    if (screen.length > 1) {
+      context.beginPath();
+      screen.forEach((p, i) => (i === 0 ? context.moveTo(p.x, p.y) : context.lineTo(p.x, p.y)));
+      context.stroke();
+    }
+    context.fillStyle = MEASUREMENT_COLOR;
+    context.strokeStyle = '#fff';
+    context.lineWidth = 1.5;
+    for (const p of screen) {
+      context.beginPath();
+      context.arc(p.x, p.y, 4, 0, 2 * Math.PI);
+      context.fill();
+      context.stroke();
+    }
+    if (label) {
+      context.font = 'bold 13px sans-serif';
+      context.lineWidth = 3;
+      context.lineJoin = 'round';
+      context.strokeText(label.text, label.x, label.y);
+      context.fillStyle = '#212529';
+      context.fillText(label.text, label.x, label.y);
+    }
+    context.restore();
   }
 
   resultText() {
@@ -273,6 +315,11 @@ class ModelViewer {
     };
   }
 
+  // Renders the current view. The canvas can be copied until the next task.
+  render() {
+    this.renderer.render(this.scene, this.camera);
+  }
+
   // Moves the camera so that the whole model is visible
   fit() {
     if (!this.object) return;
@@ -351,12 +398,120 @@ class DrawingViewer {
     return this.viewer.SceneToCanvasCoord(point.x, point.y);
   }
 
+  render() {
+    this.viewer.Render();
+  }
+
   fit() {
     const bounds = this.viewer.GetBounds();
     if (bounds) this.viewer.FitView(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY);
   }
 
   toggleWireframe() {}
+}
+
+// Draws the current view with the measurement and a caption (file name,
+// dimensions, measurement) on a new canvas
+function captureView(element, viewer, measurement) {
+  const source = viewer.canvas;
+  const width = source.clientWidth;
+  const height = source.clientHeight;
+  const scale = source.width / width;
+  const lines = [element.dataset.filename,
+                 element.querySelector('.cad-preview-dimensions').textContent,
+                 element.querySelector('.cad-preview-measurement').textContent].filter(Boolean);
+  const lineHeight = 18;
+  const captionHeight = lines.length * lineHeight + 12;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(width * scale);
+  canvas.height = Math.round((height + captionHeight) * scale);
+  const context = canvas.getContext('2d');
+  context.scale(scale, scale);
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, width, height + captionHeight);
+  viewer.render();
+  context.drawImage(source, 0, 0, width, height);
+  measurement.draw(context);
+
+  context.fillStyle = '#212529';
+  context.font = '13px sans-serif';
+  context.textBaseline = 'top';
+  lines.forEach((line, i) => context.fillText(line, 8, height + 6 + i * lineHeight, width - 16));
+  return canvas;
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('The image could not be created'))), type, quality);
+  });
+}
+
+// Creates a PDF with one A4 page that shows the canvas as a JPEG image.
+// PDF supports JPEG images directly (DCTDecode), so no library is needed.
+async function canvasToPdf(canvas) {
+  const jpeg = new Uint8Array(await (await canvasToBlob(canvas, 'image/jpeg', 0.92)).arrayBuffer());
+  const landscape = canvas.width >= canvas.height;
+  const pageWidth = landscape ? PDF_PAGE.long : PDF_PAGE.short;
+  const pageHeight = landscape ? PDF_PAGE.short : PDF_PAGE.long;
+  const fit = Math.min((pageWidth - 2 * PDF_PAGE.margin) / canvas.width,
+                       (pageHeight - 2 * PDF_PAGE.margin) / canvas.height);
+  const imageWidth = (canvas.width * fit).toFixed(2);
+  const imageHeight = (canvas.height * fit).toFixed(2);
+  const x = ((pageWidth - imageWidth) / 2).toFixed(2);
+  const y = ((pageHeight - imageHeight) / 2).toFixed(2);
+  const content = `q ${imageWidth} 0 0 ${imageHeight} ${x} ${y} cm /Im0 Do Q`;
+
+  const encoder = new TextEncoder();
+  const parts = [];
+  const offsets = [];
+  let length = 0;
+  const write = (part) => {
+    const bytes = typeof part === 'string' ? encoder.encode(part) : part;
+    parts.push(bytes);
+    length += bytes.length;
+  };
+  const object = (number, ...body) => {
+    offsets[number] = length;
+    write(`${number} 0 obj\n`);
+    body.forEach(write);
+    write('\nendobj\n');
+  };
+
+  write('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  object(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  object(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  object(3, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] ` +
+            '/Resources << /XObject << /Im0 5 0 R >> >> /Contents 4 0 R >>');
+  object(4, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  object(5, `<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} ` +
+            `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`,
+         jpeg, '\nendstream');
+  const xref = length;
+  write(`xref\n0 6\n0000000000 65535 f \n${offsets.slice(1).map((offset) => `${String(offset).padStart(10, '0')} 00000 n \n`).join('')}`);
+  write(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(parts, { type: 'application/pdf' });
+}
+
+function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function downloadView(element, viewer, measurement, type) {
+  const canvas = captureView(element, viewer, measurement);
+  const basename = (element.dataset.filename || 'cad-preview').replace(/\.[^.]+$/, '');
+  if (type === 'pdf') {
+    saveBlob(await canvasToPdf(canvas), `${basename}.pdf`);
+  } else {
+    saveBlob(await canvasToBlob(canvas, 'image/png'), `${basename}.png`);
+  }
 }
 
 function readMaximized() {
@@ -424,7 +579,9 @@ async function initialize(element) {
     'measure-distance': () => measurement.toggle('distance'),
     'measure-angle': () => measurement.toggle('angle'),
     maximize: () => setMaximized(element, !element.classList.contains('cad-preview-maximized')),
-    fullscreen: () => toggleFullscreen(element)
+    fullscreen: () => toggleFullscreen(element),
+    'download-png': () => downloadView(element, viewer, measurement, 'png'),
+    'download-pdf': () => downloadView(element, viewer, measurement, 'pdf')
   };
   element.querySelectorAll('[data-cad-action]').forEach((button) => {
     button.addEventListener('click', (event) => {

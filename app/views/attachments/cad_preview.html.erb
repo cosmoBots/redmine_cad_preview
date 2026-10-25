@@ -12,6 +12,7 @@
          data-url="<%= url %>"
          data-format="<%= format %>"
          data-error="<%= l(:text_cad_preview_error) %>"
+         data-filename="<%= @attachment.filename %>"
          <% if %w[step iges brep].include?(format) %>
          data-occt-script="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.js') %>"
          data-occt-wasm="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.wasm') %>"
@@ -29,6 +30,10 @@
         <% end %>
         <%= link_to icon.('ruler-measure', l(:button_cad_preview_measure_distance)), '#', :class => 'icon', :data => {:cad_action => 'measure-distance'} %>
         <%= link_to icon.('angle', l(:button_cad_preview_measure_angle)), '#', :class => 'icon', :data => {:cad_action => 'measure-angle'} %>
+        <% %w[png pdf].each do |type| %>
+          <%= link_to icon.("file-type-#{type}", type.upcase), '#', :class => 'icon', :title => "#{l(:button_download)} (#{type.upcase})",
+                      :data => {:cad_action => "download-#{type}"} %>
+        <% end %>
         <%= link_to icon.('arrows-maximize', l(:button_cad_preview_maximize)), '#', :class => 'icon cad-preview-maximize', :data => {:cad_action => 'maximize'} %>
         <%= link_to icon.('arrows-minimize', l(:button_cad_preview_restore)), '#', :class => 'icon cad-preview-restore', :data => {:cad_action => 'maximize'} %>
         <%= link_to icon.('maximize', l(:button_cad_preview_fullscreen)), '#', :class => 'icon cad-preview-fullscreen', :data => {:cad_action => 'fullscreen'} %>

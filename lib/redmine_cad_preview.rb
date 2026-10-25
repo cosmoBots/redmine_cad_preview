@@ -4,7 +4,8 @@ module RedmineCadPreview
   VERSION = '0.1.0'
 
   # Formats and file extensions. DWG files are converted to DXF on the server.
-  # Inventor files are shown with the preview image saved in the file.
+  # Inventor and Solid Edge files are shown with the preview image saved in
+  # the file (IMAGE_FORMATS).
   FORMATS = {
     'step' => %w[.step .stp],
     'iges' => %w[.iges .igs],
@@ -16,8 +17,13 @@ module RedmineCadPreview
     'glb' => %w[.glb],
     'dxf' => %w[.dxf],
     'dwg' => %w[.dwg],
-    'inventor' => %w[.ipt .iam .ipn .idw .ide]
+    'inventor' => %w[.ipt .iam .ipn .idw .ide],
+    'solid_edge' => %w[.par .asm .psm .pwd .dft]
   }.freeze
+
+  # Formats that cannot be displayed in the viewer, only with the image
+  # saved in the file
+  IMAGE_FORMATS = %w[inventor solid_edge].freeze
 
   DEFAULT_SETTINGS = {
     'formats' => FORMATS.keys,
@@ -54,6 +60,8 @@ module RedmineCadPreview
       return false unless format && enabled_formats.include?(format)
       return false unless attachment.readable? && attachment.filesize <= max_file_size
       return DwgConverter.available? if format == 'dwg'
+      # .asm is also the extension of assembler source files
+      return CompoundFile.signature?(attachment.diskfile) if format == 'solid_edge'
 
       true
     end

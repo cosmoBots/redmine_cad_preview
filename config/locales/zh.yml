@@ -24,5 +24,6 @@ zh:
   label_cad_preview_dimensions: "尺寸"
   label_cad_preview_units: "单位"
   text_cad_preview_inventor_image: "Inventor 文件中保存的预览图像。如需以 3D 方式查看，请在 Inventor 中将模型导出为 STEP。"
-  text_cad_preview_no_image: "该 Inventor 文件不包含预览图像。"
+  text_cad_preview_solid_edge_image: "Solid Edge 文件中保存的预览图像。如需以 3D 方式查看，请在 Solid Edge 中将模型导出为 STEP。"
+  text_cad_preview_no_image: "该文件不包含预览图像。"
   text_cad_preview_solids: "该图纸包含无法在预览中显示的三维实体。"

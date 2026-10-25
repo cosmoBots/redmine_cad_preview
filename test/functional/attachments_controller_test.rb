@@ -84,6 +84,24 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'div.cad-preview', 0
   end
 
+  def test_show_solid_edge_file
+    attachment = create_cad_attachment('part.par')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_response :success
+    assert_select '.cad-preview-image img[src=?]', "/cad_previews/#{attachment.id}/image"
+    assert_select 'p.cad-preview-hint', :text => /from Solid Edge/
+  end
+
+  def test_show_assembler_source_file_should_not_be_previewed_as_solid_edge_file
+    attachment = create_cad_attachment('notes.txt', :as => 'boot.asm')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_response :success
+    assert_select '.cad-preview-image', 0
+    assert_select 'p.cad-preview-message', 0
+  end
+
   def test_show_inventor_file_without_image
     attachment = create_cad_attachment('notes.txt', :as => 'part.ipt')
 

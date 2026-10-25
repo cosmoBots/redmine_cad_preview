@@ -24,5 +24,6 @@ pl:
   label_cad_preview_dimensions: "Wymiary"
   label_cad_preview_units: "jednostki"
   text_cad_preview_inventor_image: "Obraz podglądu zapisany w pliku Inventor. Aby wyświetlić model w 3D, wyeksportuj go z programu Inventor do formatu STEP."
-  text_cad_preview_no_image: "Plik Inventor nie zawiera obrazu podglądu."
+  text_cad_preview_solid_edge_image: "Obraz podglądu zapisany w pliku Solid Edge. Aby wyświetlić model w 3D, wyeksportuj go z programu Solid Edge do formatu STEP."
+  text_cad_preview_no_image: "Plik nie zawiera obrazu podglądu."
   text_cad_preview_solids: "Rysunek zawiera bryły 3D, których nie można wyświetlić w podglądzie."

@@ -25,7 +25,7 @@ class CadPreviewPreviewImageTest < ActiveSupport::TestCase
     attachment = create_cad_attachment('part.ipt')
     path = RedmineCadPreview::PreviewImage.extract(attachment)
 
-    RedmineCadPreview::InventorThumbnail.expects(:extract).never
+    RedmineCadPreview::OleThumbnail.expects(:extract).never
     assert_equal path, RedmineCadPreview::PreviewImage.extract(attachment)
   end
 
@@ -33,9 +33,14 @@ class CadPreviewPreviewImageTest < ActiveSupport::TestCase
     attachment = create_cad_attachment('notes.txt', :as => 'part.ipt')
     assert_nil RedmineCadPreview::PreviewImage.extract(attachment)
 
-    RedmineCadPreview::InventorThumbnail.expects(:extract).never
+    RedmineCadPreview::OleThumbnail.expects(:extract).never
     assert_nil RedmineCadPreview::PreviewImage.extract(attachment)
     assert_nil RedmineCadPreview::PreviewImage.path(attachment)
+  end
+
+  def test_extract_from_solid_edge_file
+    attachment = create_cad_attachment('part.par')
+    assert_equal 'BM', File.binread(RedmineCadPreview::PreviewImage.extract(attachment), 2)
   end
 
   def test_extract_from_3mf_file

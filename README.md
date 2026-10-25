@@ -17,13 +17,13 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **In the browser**: The files are displayed by a viewer that runs in the browser (three.js, OpenCASCADE as WebAssembly, dxf-viewer). The libraries are included in the plugin, so no internet access is needed.
 - **Files stay in Redmine**: The browser loads the file from Redmine with the same permissions as a download. No file is sent to a third party.
 - **DWG on the server**: DWG files are converted to DXF on the server with [LibreDWG](https://www.gnu.org/software/libredwg/). The conversion runs in the background right after the upload, so the preview is ready when it is opened.
-- **Thumbnails**: The thumbnails in the attachment lists are made from the image that CAD programs save in the file (Inventor, 3MF, DXF, DWG). For files without image, the browser sends a snapshot of the viewer when the preview is opened for the first time by a user who can edit the attachment.
+- **Thumbnails**: The thumbnails in the attachment lists are made from the image that CAD programs save in the file (Inventor, Solid Edge, 3MF, DXF, DWG). For files without image, the browser sends a snapshot of the viewer when the preview is opened for the first time by a user who can edit the attachment.
 
 ## 🌟 Features
 
 - **3D preview** – STEP (.step, .stp), IGES (.iges, .igs), BREP (.brep, .brp), STL, OBJ, 3MF, glTF (.gltf, .glb)
 - **2D preview** – DXF, and DWG converted to DXF
-- **Autodesk Inventor** (.ipt, .iam, .ipn, .idw, .ide) – Shows the preview image that Inventor saves in the file
+- **Autodesk Inventor** (.ipt, .iam, .ipn, .idw, .ide) and **Solid Edge** (.par, .asm, .psm, .pwd, .dft) – Shows the preview image that these programs save in the file
 - **Thumbnails** – CAD attachments get thumbnails in the attachment lists, like images (with ImageMagick, if thumbnails are enabled in the Redmine settings)
 - **File icons** – 3D models and 2D drawings get their own icons in the attachment lists, from Redmine 7.0 (which shows file type icons there). Redmine 7.0 only passes the content type, so only files with a CAD content type get the icons there, e.g. DWG, DXF, STL and IGES. Redmine trunk also passes the filename, so all CAD files get the icons. Icons of the theme are used first.
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
@@ -74,7 +74,8 @@ The conversion runs as an Active Job. With the default queue adapter of Redmine,
 - **glTF**: `.gltf` files that reference external `.bin` or texture files are not supported. Use `.glb` instead.
 - **Large models**: STEP and IGES files are converted to triangles in the browser. Very large models can take a while and need a lot of memory.
 - **Measuring**: Points are picked on the surface of the model or anywhere in the drawing, without snapping to edges or end points. STL, OBJ and 3MF files have no unit, so measurements are shown in "units".
-- **Autodesk Inventor**: Only the preview image saved in the file is shown, the model itself cannot be read without Inventor. Export the model as STEP from Inventor to view it in 3D. The image is the view of the last save in Inventor.
+- **Autodesk Inventor and Solid Edge**: Only the preview image saved in the file is shown, the model itself cannot be read without these programs. Export the model as STEP to view it in 3D. The image is the view of the last save.
+- **.asm files** are only treated as Solid Edge assemblies if they are OLE compound files, so that assembler source files are not affected.
 
 ## 📋 Requirements
 

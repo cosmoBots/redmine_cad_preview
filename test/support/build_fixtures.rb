@@ -3,8 +3,10 @@
 # Builds the test files with images in test/fixtures/files:
 #
 # * part.ipt, assembly.iam: minimal OLE compound files with the "Inventor
-#   Summary Information" stream that contains a PNG image, like the files
-#   saved by Inventor
+#   Summary Information" property set that contains a PNG image, like the
+#   files saved by Inventor
+# * part.par: a minimal OLE compound file with the "SummaryInformation"
+#   property set that contains a bitmap, like the files saved by Solid Edge
 # * thumbnail.3mf: a 3MF file with a thumbnail
 # * thumbnail.dxf: a DXF file with a bitmap in the THUMBNAILIMAGE section,
 #   like the files saved by AutoCAD
@@ -21,7 +23,8 @@ SECTOR_SIZE = 512
 FREE = 0xFFFFFFFF
 END_OF_CHAIN = 0xFFFFFFFE
 FAT_SECTOR = 0xFFFFFFFD
-STREAM_NAME = "\u0005Zrxrt4arFafyu34gYa3l3ohgHg"
+INVENTOR_STREAM = "\u0005Zrxrt4arFafyu34gYa3l3ohgHg"
+SUMMARY_STREAM = "\u0005SummaryInformation"
 FIXTURES = File.expand_path('../fixtures/files', __dir__)
 
 def pad(data, size)
@@ -44,7 +47,7 @@ def chain(first, count)
 end
 
 # The stream is stored in the mini stream if it is smaller than 4096 bytes
-def compound_file(stream)
+def compound_file(stream, stream_name)
   mini = stream.bytesize < 4096
   data = mini ? pad(stream, 64) : pad(stream, SECTOR_SIZE)
   data_sectors = pad(data, SECTOR_SIZE).bytesize / SECTOR_SIZE
@@ -52,7 +55,7 @@ def compound_file(stream)
   mini_fat = mini ? chain(0, data.bytesize / 64) : []
 
   root = directory_entry('Root Entry', 5, 1, mini ? 3 : END_OF_CHAIN, mini ? data.bytesize : 0)
-  entry = directory_entry(STREAM_NAME, 2, FREE, mini ? 0 : 3, stream.bytesize)
+  entry = directory_entry(stream_name, 2, FREE, mini ? 0 : 3, stream.bytesize)
   header = ['D0CF11E0A1B11AE1'].pack('H*') + ("\0".b * 16) +
            [0x3E, 3, 0xFFFE, 9, 6].pack('v5') + ("\0".b * 6) +
            [0, 1, 1, 0, 4096, mini ? 2 : END_OF_CHAIN, mini ? 1 : 0, END_OF_CHAIN, 0, 0].pack('V10') +
@@ -65,10 +68,21 @@ def compound_file(stream)
     pad(data, SECTOR_SIZE)
 end
 
+# Property set ([MS-OLEPS]) with the thumbnail property (17) as clipboard
+# data (71). The padding before the property makes the stream large enough
+# to be stored in regular sectors instead of the mini stream.
+def property_set(format, image, padding: 0)
+  value = [71, 8 + image.bytesize, -1, format].pack('VVl<V') + image
+  section = [8 + 8 + 8 + value.bytesize + padding, 1, 17, 16 + padding].pack('V4') + ("\0".b * padding) + value
+  [0xFFFE, 0, 0].pack('vvV') + ("\0".b * 16) + [1].pack('V') + ("\0".b * 16) + [48].pack('V') + section
+end
+
 png = File.binread(ARGV[0] || File.join(FIXTURES, 'thumbnail.png'))
-property_header = "\xFE\xFF\0\0".b
-File.binwrite(File.join(FIXTURES, 'part.ipt'), compound_file(property_header + ("\0".b * 5000) + png))
-File.binwrite(File.join(FIXTURES, 'assembly.iam'), compound_file(property_header + png))
+# Inventor: a Windows metafile (3) with the size of the image, but the data is a PNG image
+metafile_header = [8, 512, 512, 0].pack('vvvv')
+File.binwrite(File.join(FIXTURES, 'part.ipt'),
+              compound_file(property_set(3, metafile_header + png, :padding => 5000), INVENTOR_STREAM))
+File.binwrite(File.join(FIXTURES, 'assembly.iam'), compound_file(property_set(3, metafile_header + png), INVENTOR_STREAM))
 
 model = <<~XML
   <?xml version="1.0" encoding="UTF-8"?>
@@ -124,3 +138,6 @@ preview = [0, 2].pack('VC') +
           [1, position, preview_header.bytesize, 2, position + preview_header.bytesize, dib.bytesize].pack('CVVCVV') +
           preview_header + dib
 File.write(File.join(FIXTURES, 'thumbnail.dwg'), dxf_with_thumbnail(preview))
+
+# Solid Edge: a bitmap without file header (8)
+File.binwrite(File.join(FIXTURES, 'part.par'), compound_file(property_set(8, dib), SUMMARY_STREAM))

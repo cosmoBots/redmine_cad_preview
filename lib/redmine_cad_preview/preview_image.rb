@@ -5,8 +5,8 @@ require 'zip'
 
 module RedmineCadPreview
   # Images of CAD attachments for the thumbnails of Redmine and the preview of
-  # Inventor files. The image is either saved in the file itself (Inventor,
-  # 3MF, DXF, DWG), or a snapshot of the viewer that the browser sends when the
+  # Inventor and Solid Edge files. The image is either saved in the file
+  # itself (Inventor, Solid Edge, 3MF, DXF, DWG), or a snapshot of the viewer that the browser sends when the
   # preview is opened for the first time.
   #
   # The images are kept next to the converted DWG files:
@@ -16,7 +16,7 @@ module RedmineCadPreview
   #   <digest>_<filesize>.snapshot.png  the snapshot of the viewer
   module PreviewImage
     # Formats that can contain an image
-    EMBEDDED_FORMATS = %w[inventor 3mf dxf dwg].freeze
+    EMBEDDED_FORMATS = %w[inventor solid_edge 3mf dxf dwg].freeze
     # Maximum size of a snapshot sent by the browser
     MAX_SNAPSHOT_SIZE = 2.megabytes
     # Maximum size of an image saved in a 3MF file
@@ -88,7 +88,7 @@ module RedmineCadPreview
       # if the image can be read after the conversion of a DWG file
       def read_image(format, attachment)
         case format
-        when 'inventor' then InventorThumbnail.extract(attachment.diskfile)
+        when 'inventor', 'solid_edge' then OleThumbnail.extract(attachment.diskfile)
         when '3mf' then read_3mf_thumbnail(attachment.diskfile)
         when 'dxf' then DxfThumbnail.extract(attachment.diskfile)
         when 'dwg' then read_dwg_thumbnail(attachment)

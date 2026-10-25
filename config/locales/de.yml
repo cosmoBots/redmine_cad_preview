@@ -24,5 +24,6 @@ de:
   label_cad_preview_dimensions: "Abmessungen"
   label_cad_preview_units: "Einheiten"
   text_cad_preview_inventor_image: "Vorschaubild aus der Inventor-Datei. Für die 3D-Ansicht das Modell in Inventor als STEP exportieren."
-  text_cad_preview_no_image: "Die Inventor-Datei enthält kein Vorschaubild."
+  text_cad_preview_solid_edge_image: "Vorschaubild aus der Solid-Edge-Datei. Für die 3D-Ansicht das Modell in Solid Edge als STEP exportieren."
+  text_cad_preview_no_image: "Die Datei enthält kein Vorschaubild."
   text_cad_preview_solids: "Die Zeichnung enthält 3D-Volumenkörper, die in der Vorschau nicht angezeigt werden können."

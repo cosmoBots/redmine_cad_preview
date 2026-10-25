@@ -14,12 +14,12 @@ jobs:
     env:
       DEPENDABOT: ${{ github.actor == 'dependabot[bot]' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The branch, so that the rebuilt files can be pushed to it
           ref: ${{ github.actor == 'dependabot[bot]' && github.head_ref || '' }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm

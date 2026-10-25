@@ -83,6 +83,15 @@ function occtResultToObject(result) {
   return group;
 }
 
+function hasZeroNormals(geometry) {
+  const normals = geometry.getAttribute('normal')?.array;
+  if (!normals) return true;
+  for (let i = 0; i < normals.length; i += 3) {
+    if (normals[i] === 0 && normals[i + 1] === 0 && normals[i + 2] === 0) return true;
+  }
+  return false;
+}
+
 function formatNumber(value) {
   return new Intl.NumberFormat(document.documentElement.lang || undefined, { maximumFractionDigits: 3 }).format(value);
 }
@@ -265,6 +274,8 @@ class ModelViewer {
     switch (this.format) {
       case 'stl': {
         const geometry = new STLLoader().parse(buffer);
+        // Some programs write zero normals, which are displayed black
+        if (hasZeroNormals(geometry)) geometry.computeVertexNormals();
         return new THREE.Mesh(geometry, defaultMaterial(geometry.hasColors ? 0xffffff : DEFAULT_COLOR));
       }
       case 'obj': {
@@ -402,9 +413,13 @@ class DrawingViewer {
     this.viewer.Render();
   }
 
+  // The bounds are in drawing coordinates, the view in scene coordinates
   fit() {
     const bounds = this.viewer.GetBounds();
-    if (bounds) this.viewer.FitView(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY);
+    const origin = this.viewer.GetOrigin();
+    if (bounds) {
+      this.viewer.FitView(bounds.minX - origin.x, bounds.maxX - origin.x, bounds.minY - origin.y, bounds.maxY - origin.y);
+    }
   }
 
   toggleWireframe() {}

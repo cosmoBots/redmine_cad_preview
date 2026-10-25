@@ -1,0 +1,43 @@
+.cad-preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-block-end: 6px;
+}
+
+.cad-preview-hint {
+  color: var(--color-text-muted, #6b737b);
+  font-size: 0.9em;
+}
+
+.cad-preview-canvas {
+  position: relative;
+  block-size: 70vh;
+  min-block-size: 400px;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cad-preview-canvas canvas {
+  display: block;
+}
+
+.cad-preview-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted, #6b737b);
+  pointer-events: none;
+}
+
+.cad-preview-status[hidden] {
+  display: none;
+}
+
+.cad-preview-status.cad-preview-error {
+  color: #c92a2a;
+}

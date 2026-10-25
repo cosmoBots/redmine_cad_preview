@@ -1,0 +1,17 @@
+{
+  "name": "redmine-cad-preview-frontend",
+  "private": true,
+  "description": "Builds the CAD viewer of the redmine_cad_preview plugin",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@fontsource/noto-sans": "5.3.0",
+    "dxf-viewer": "1.0.50",
+    "occt-import-js": "0.0.23",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

@@ -1,0 +1,39 @@
+<%= render :layout => 'layouts/file' do %>
+  <% format = @cad_format == 'dwg' ? 'dxf' : @cad_format %>
+  <% dwg_state = RedmineCadPreview::DwgConverter.state(@attachment) if @cad_format == 'dwg' %>
+  <% if dwg_state == :converting || dwg_state == :failed %>
+    <p class="<%= dwg_state == :failed ? 'nodata' : 'warning' %> cad-preview-message">
+      <%= l(dwg_state == :failed ? :text_cad_preview_conversion_failed : :text_cad_preview_converting) %>
+    </p>
+  <% else %>
+    <% url = @cad_format == 'dwg' ? cad_preview_dxf_path(@attachment) : cad_preview_file_path(@attachment) %>
+    <div class="cad-preview"
+         data-cad-preview
+         data-url="<%= url %>"
+         data-format="<%= format %>"
+         data-error="<%= l(:text_cad_preview_error) %>"
+         <% if %w[step iges brep].include?(format) %>
+         data-occt-script="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.js') %>"
+         data-occt-wasm="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.wasm') %>"
+         <% end %>
+         <% if format == 'dxf' %>
+         data-fonts="<%= %w[latin latin-ext].map {|s| asset_path("plugin_assets/redmine_cad_preview/noto-sans-#{s}-400-normal.woff")}.to_json %>"
+         <% end %>>
+      <div class="cad-preview-toolbar">
+        <%= link_to sprite_icon('maximize', l(:button_cad_preview_fit)), '#', :class => 'icon', :data => {:cad_action => 'fit'} %>
+        <% unless format == 'dxf' %>
+          <%= link_to sprite_icon('table-multiple', l(:button_cad_preview_wireframe)), '#', :class => 'icon', :data => {:cad_action => 'wireframe'} %>
+        <% end %>
+        <span class="cad-preview-hint"><%= l(format == 'dxf' ? :text_cad_preview_hint_2d : :text_cad_preview_hint_3d) %></span>
+      </div>
+      <div class="cad-preview-canvas">
+        <div class="cad-preview-status"><%= l(:label_loading) %></div>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'cad_preview', :plugin => 'redmine_cad_preview' %>
+  <%= javascript_include_tag 'cad_preview', :plugin => 'redmine_cad_preview', :type => 'module' %>
+<% end %>

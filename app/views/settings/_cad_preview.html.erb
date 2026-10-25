@@ -1,0 +1,38 @@
+<p>
+  <label><%= l(:label_cad_preview_formats) %></label>
+  <% RedmineCadPreview::FORMATS.each do |format, extensions| %>
+    <label class="block">
+      <%= check_box_tag 'settings[formats][]', format, RedmineCadPreview.enabled_formats.include?(format), :id => nil %>
+      <%= extensions.join(', ') %>
+    </label>
+  <% end %>
+  <%= hidden_field_tag 'settings[formats][]', '', :id => nil %>
+</p>
+
+<p>
+  <%= label_tag 'settings_max_file_size', l(:label_cad_preview_max_file_size) %>
+  <%= number_field_tag 'settings[max_file_size]', RedmineCadPreview.max_file_size / 1.megabyte,
+                       :id => 'settings_max_file_size', :min => 1, :size => 6 %> MB
+</p>
+
+<fieldset class="box">
+  <legend><%= l(:label_cad_preview_dwg) %></legend>
+  <p>
+    <% if RedmineCadPreview::DwgConverter.available? %>
+      <%= sprite_icon('checked', l(:text_cad_preview_dwg_available)) %>
+    <% else %>
+      <%= sprite_icon('warning', l(:text_cad_preview_dwg_not_available)) %>
+    <% end %>
+  </p>
+  <p>
+    <%= label_tag 'settings_dwg2dxf_command', l(:label_cad_preview_dwg2dxf_command) %>
+    <%= text_field_tag 'settings[dwg2dxf_command]', RedmineCadPreview::DwgConverter.command,
+                       :id => 'settings_dwg2dxf_command', :size => 60 %>
+  </p>
+  <p>
+    <%= label_tag 'settings_conversion_timeout', l(:label_cad_preview_conversion_timeout) %>
+    <%= number_field_tag 'settings[conversion_timeout]', RedmineCadPreview::DwgConverter.timeout,
+                         :id => 'settings_conversion_timeout', :min => 1, :size => 6 %>
+    <em><%= l(:field_timeout) %></em>
+  </p>
+</fieldset>

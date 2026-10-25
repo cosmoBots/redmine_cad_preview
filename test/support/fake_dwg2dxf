@@ -1,0 +1,13 @@
+#!/bin/sh
+# Stand-in for LibreDWG's dwg2dxf used by the tests:
+#   fake_dwg2dxf [--version] [-y] -o <output> <input>
+# Copies the input to the output. FAKE_DWG2DXF_MODE=fail or =sleep makes it
+# fail or hang.
+case "$1" in --version) echo "fake_dwg2dxf 1.0"; exit 0;; esac
+[ "$FAKE_DWG2DXF_MODE" = "fail" ] && exit 1
+[ "$FAKE_DWG2DXF_MODE" = "sleep" ] && sleep 10
+output=""
+while [ $# -gt 1 ]; do
+  case "$1" in -o) output="$2"; shift 2;; *) shift;; esac
+done
+cp "$1" "$output"

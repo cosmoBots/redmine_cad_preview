@@ -25,3 +25,4 @@ ja:
   label_cad_preview_units: "単位"
   text_cad_preview_inventor_image: "Inventor ファイルに保存されたプレビュー画像です。3D で表示するには、Inventor でモデルを STEP 形式でエクスポートしてください。"
   text_cad_preview_no_image: "この Inventor ファイルにはプレビュー画像が含まれていません。"
+  text_cad_preview_solids: "この図面には、プレビューで表示できない 3D ソリッドが含まれています。"

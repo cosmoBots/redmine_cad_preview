@@ -49,7 +49,7 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     get(:show, :params => {:id => attachment.id})
     assert_select 'div.cad-preview[data-i18n]' do |element|
       i18n = JSON.parse(element.first['data-i18n'])
-      assert_equal %w[angle dimensions distance units], i18n.keys.sort
+      assert_equal %w[angle dimensions distance solids units], i18n.keys.sort
       assert_equal 'Distance', i18n['distance']
     end
   end
@@ -123,6 +123,14 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = nil
 
     get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview:not([data-snapshot-url])'
+  end
+
+  def test_show_dxf_file_with_image
+    attachment = create_cad_attachment('thumbnail.dxf')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview[data-image-url=?]', "/cad_previews/#{attachment.id}/image"
     assert_select 'div.cad-preview:not([data-snapshot-url])'
   end
 

@@ -25,3 +25,4 @@ ru:
   label_cad_preview_units: "единиц"
   text_cad_preview_inventor_image: "Изображение предварительного просмотра, сохранённое в файле Inventor. Чтобы просмотреть модель в 3D, экспортируйте её из Inventor в формат STEP."
   text_cad_preview_no_image: "Файл Inventor не содержит изображения предварительного просмотра."
+  text_cad_preview_solids: "Чертёж содержит 3D-тела, которые невозможно отобразить в предварительном просмотре."

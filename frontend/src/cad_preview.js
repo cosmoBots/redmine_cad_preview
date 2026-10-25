@@ -12,6 +12,8 @@
 //   data-filename     Name of the file, used for the downloaded images
 //   data-snapshot-url URL to send the snapshot for the thumbnail to (only for
 //                     attachments without thumbnail and users who can edit them)
+//   data-image-url    URL of the image saved in the file (DXF, DWG), shown for
+//                     drawings of 3D solids
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -20,6 +22,7 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DxfViewer } from 'dxf-viewer';
+import DxfParser from 'dxf-viewer/src/parser/DxfParser.js';
 
 const Z_UP_FORMATS = ['step', 'iges', 'brep', 'stl', '3mf'];
 const OCCT_FORMATS = { step: 'ReadStepFile', iges: 'ReadIgesFile', brep: 'ReadBrepFile' };
@@ -36,6 +39,28 @@ const MEASUREMENT_COLOR = '#e8590c';
 const PDF_PAGE = { long: 842, short: 595, margin: 28 };
 // Maximum size of the snapshot for the thumbnail (the largest Redmine thumbnail)
 const SNAPSHOT_SIZE = 800;
+
+// 3D solids (ACIS data) cannot be displayed by dxf-viewer, which skips them.
+// They are parsed as empty entities, so that the preview can tell that they
+// are missing.
+const SOLID_TYPES = ['3DSOLID', 'BODY', 'REGION', 'SURFACE'];
+const SOLID_HANDLERS = SOLID_TYPES.map((type) => {
+  function SolidParser() {}
+  SolidParser.ForEntityName = type;
+  SolidParser.prototype.parseEntity = (scanner) => {
+    let group = scanner.next();
+    while (group !== 'EOF' && group.code !== 0) group = scanner.next();
+    return { type };
+  };
+  return SolidParser;
+});
+const registerEntityHandler = DxfParser.prototype.registerEntityHandler;
+DxfParser.prototype.registerEntityHandler = function register(handlerType) {
+  registerEntityHandler.call(this, handlerType);
+  for (const handler of SOLID_HANDLERS) {
+    if (!this._entityHandlers[handler.ForEntityName]) registerEntityHandler.call(this, handler);
+  }
+};
 
 let occtPromise = null;
 
@@ -392,7 +417,12 @@ class DrawingViewer {
       url: this.element.dataset.url,
       fonts: JSON.parse(this.element.dataset.fonts || '[]')
     });
-    this.unit = DXF_UNITS[this.viewer.GetDxf()?.header?.$INSUNITS];
+    const dxf = this.viewer.GetDxf();
+    this.unit = DXF_UNITS[dxf?.header?.$INSUNITS];
+    const entities = dxf?.entities || [];
+    this.solids = entities.filter((entity) => SOLID_TYPES.includes(entity.type)).length;
+    // A drawing made mostly of 3D solids looks empty in the viewer
+    this.mostlySolids = this.solids > 0 && this.solids >= entities.length - this.solids;
     this.fit();
   }
 
@@ -553,6 +583,24 @@ async function sendSnapshot(element, viewer) {
   });
 }
 
+// Shows a notice for drawings with 3D solids, and the image saved in the file
+// instead of a drawing that looks empty
+function showSolidsNotice(element, viewer, i18n) {
+  if (!viewer.solids) return;
+  const notice = document.createElement('p');
+  notice.className = 'warning cad-preview-notice';
+  notice.textContent = i18n.solids;
+  element.querySelector('.cad-preview-canvas').before(notice);
+
+  if (viewer.mostlySolids && element.dataset.imageUrl) {
+    const image = document.createElement('img');
+    image.className = 'cad-preview-fallback-image';
+    image.src = element.dataset.imageUrl;
+    image.alt = element.dataset.filename || '';
+    element.querySelector('.cad-preview-canvas').appendChild(image);
+  }
+}
+
 function readMaximized() {
   try {
     return window.localStorage.getItem(MAXIMIZED_STORAGE_KEY) === 'true';
@@ -641,8 +689,9 @@ async function initialize(element) {
     viewer.measurement = measurement;
     onClick(viewer.canvas, (event) => measurement.click(event.clientX, event.clientY));
     showDimensions(element, viewer, i18n);
+    showSolidsNotice(element, viewer, i18n);
     status.hidden = true;
-    if (element.dataset.snapshotUrl) {
+    if (element.dataset.snapshotUrl && !viewer.mostlySolids) {
       sendSnapshot(element, viewer).catch((error) => console.error('CAD preview snapshot:', error));
     }
   } catch (error) {

@@ -25,3 +25,4 @@ ko:
   label_cad_preview_units: "단위"
   text_cad_preview_inventor_image: "Inventor 파일에 저장된 미리보기 이미지입니다. 3D로 보려면 Inventor에서 모델을 STEP으로 내보내세요."
   text_cad_preview_no_image: "Inventor 파일에 미리보기 이미지가 없습니다."
+  text_cad_preview_solids: "이 도면에는 미리보기에 표시할 수 없는 3D 솔리드가 포함되어 있습니다."

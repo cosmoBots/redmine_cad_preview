@@ -22,6 +22,9 @@
          data-format="<%= format %>"
          data-error="<%= l(:text_cad_preview_error) %>"
          data-filename="<%= @attachment.filename %>"
+         <% if @cad_image && format == 'dxf' %>
+         data-image-url="<%= cad_preview_image_path(@attachment) %>"
+         <% end %>
          <% if @cad_snapshot %>
          data-snapshot-url="<%= cad_preview_snapshot_path(@attachment) %>"
          <% end %>
@@ -33,7 +36,8 @@
          data-fonts="<%= %w[latin latin-ext].map {|s| asset_path("plugin_assets/redmine_cad_preview/noto-sans-#{s}-400-normal.woff")}.to_json %>"
          <% end %>
          data-i18n="<%= {:distance => l(:label_cad_preview_distance), :angle => l(:label_cad_preview_angle),
-                         :dimensions => l(:label_cad_preview_dimensions), :units => l(:label_cad_preview_units)}.to_json %>">
+                         :dimensions => l(:label_cad_preview_dimensions), :units => l(:label_cad_preview_units),
+                         :solids => l(:text_cad_preview_solids)}.to_json %>">
       <div class="cad-preview-toolbar">
         <% icon = ->(name, label) { sprite_icon(name, label, :plugin => 'redmine_cad_preview') } %>
         <%= link_to icon.('zoom-scan', l(:button_cad_preview_fit)), '#', :class => 'icon', :data => {:cad_action => 'fit'} %>

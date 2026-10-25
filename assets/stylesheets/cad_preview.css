@@ -141,3 +141,17 @@ body.cad-preview-maximized-body {
   max-inline-size: 100%;
   block-size: auto;
 }
+
+/* Drawings of 3D solids, which the viewer cannot display */
+.cad-preview-notice {
+  margin-block: 0 6px;
+}
+
+.cad-preview-fallback-image {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: scale-down;
+  background: #fff;
+}

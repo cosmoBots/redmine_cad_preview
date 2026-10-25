@@ -25,3 +25,4 @@ es:
   label_cad_preview_units: "unidades"
   text_cad_preview_inventor_image: "Imagen de vista previa guardada en el archivo de Inventor. Exporte el modelo como STEP desde Inventor para verlo en 3D."
   text_cad_preview_no_image: "El archivo de Inventor no contiene ninguna imagen de vista previa."
+  text_cad_preview_solids: "El dibujo contiene sólidos 3D que no se pueden mostrar en la vista previa."

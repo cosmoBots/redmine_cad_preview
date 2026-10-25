@@ -54,6 +54,13 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_show_freecad_file_should_load_occt
+    attachment = create_cad_attachment('thumbnail.FCStd')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview[data-format=freecad][data-occt-script][data-occt-wasm]'
+  end
+
   def test_show_ply_file
     attachment = create_cad_attachment('model.ply')
 

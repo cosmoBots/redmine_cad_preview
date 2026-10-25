@@ -8,6 +8,7 @@
 # * part.par: a minimal OLE compound file with the "SummaryInformation"
 #   property set that contains a bitmap, like the files saved by Solid Edge
 # * thumbnail.3mf: a 3MF file with a thumbnail
+# * thumbnail.FCStd: a FreeCAD document with a thumbnail
 # * thumbnail.dxf: a DXF file with a bitmap in the THUMBNAILIMAGE section,
 #   like the files saved by AutoCAD
 # * thumbnail.dwg: a DXF file with the preview of a DWG file in the
@@ -141,3 +142,11 @@ File.write(File.join(FIXTURES, 'thumbnail.dwg'), dxf_with_thumbnail(preview))
 
 # Solid Edge: a bitmap without file header (8)
 File.binwrite(File.join(FIXTURES, 'part.par'), compound_file(property_set(8, dib), SUMMARY_STREAM))
+
+# FreeCAD document: a ZIP archive with Document.xml and the thumbnail
+path = File.join(FIXTURES, 'thumbnail.FCStd')
+FileUtils.rm_f(path)
+Zip::File.open(path, create: true) do |zip|
+  zip.get_output_stream('Document.xml') {|f| f.write(%(<?xml version='1.0' encoding='utf-8'?>\n<Document SchemaVersion="4"/>\n))}
+  zip.get_output_stream('thumbnails/Thumbnail.png') {|f| f.write(png)}
+end

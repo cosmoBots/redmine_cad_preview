@@ -3,10 +3,10 @@
 // The viewer is configured by the data attributes of the element
 // [data-cad-preview]:
 //   data-url          URL of the file (or of the DXF converted from a DWG file)
-//   data-format       step, iges, brep, stl, obj, 3mf, gltf, glb, ply, dae, fbx,
-//                     vrml, amf, 3ds or dxf
-//   data-occt-script  URL of occt-import-js.js (STEP, IGES and BREP only)
-//   data-occt-wasm    URL of occt-import-js.wasm (STEP, IGES and BREP only)
+//   data-format       step, iges, brep, freecad, stl, obj, 3mf, gltf, glb, ply,
+//                     dae, fbx, vrml, amf, 3ds or dxf
+//   data-occt-script  URL of occt-import-js.js (STEP, IGES, BREP and FreeCAD only)
+//   data-occt-wasm    URL of occt-import-js.wasm (STEP, IGES, BREP and FreeCAD only)
 //   data-fonts        JSON array of font URLs (DXF only)
 //   data-error        Message shown when the file cannot be displayed
 //   data-i18n         JSON object with the labels of the measurements
@@ -28,13 +28,14 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { VRMLLoader } from 'three/addons/loaders/VRMLLoader.js';
 import { AMFLoader } from 'three/addons/loaders/AMFLoader.js';
 import { TDSLoader } from 'three/addons/loaders/TDSLoader.js';
+import { strFromU8, unzipSync } from 'three/addons/libs/fflate.module.js';
 import { DxfViewer } from 'dxf-viewer';
 import DxfParser from 'dxf-viewer/src/parser/DxfParser.js';
 
-const Z_UP_FORMATS = ['step', 'iges', 'brep', 'stl', '3mf', 'amf', '3ds'];
+const Z_UP_FORMATS = ['step', 'iges', 'brep', 'freecad', 'stl', '3mf', 'amf', '3ds'];
 const OCCT_FORMATS = { step: 'ReadStepFile', iges: 'ReadIgesFile', brep: 'ReadBrepFile' };
 // occt-import-js returns millimeters, glTF uses meters, the other formats have no unit
-const MODEL_UNITS = { step: 'mm', iges: 'mm', brep: 'mm', gltf: 'm', glb: 'm' };
+const MODEL_UNITS = { step: 'mm', iges: 'mm', brep: 'mm', freecad: 'mm', gltf: 'm', glb: 'm' };
 // $INSUNITS of DXF files
 const DXF_UNITS = { 1: 'in', 2: 'ft', 3: 'mi', 4: 'mm', 5: 'cm', 6: 'm', 7: 'km', 10: 'yd', 14: 'dm' };
 const DEFAULT_COLOR = 0x9aa5b1;
@@ -157,6 +158,50 @@ function prepareObject(object) {
     child.parent.remove(child);
   }
   return object;
+}
+
+// FreeCAD documents (.FCStd) are ZIP archives. Document.xml lists the objects
+// with the BREP files of their shapes. Only the visible objects are shown, not
+// the features they are made of. The visibility is in Document.xml (FreeCAD
+// 0.20 and later) or in GuiDocument.xml, the color in GuiDocument.xml.
+function freecadToObject(buffer, occt) {
+  const files = unzipSync(new Uint8Array(buffer));
+  const parse = (name) => files[name] && new DOMParser().parseFromString(strFromU8(files[name]), 'application/xml');
+  const documentXml = parse('Document.xml');
+  if (!documentXml) throw new Error('Document.xml is missing');
+
+  const property = (element, name) => [...(element?.querySelectorAll(':scope > Properties > Property') || [])]
+    .find((p) => p.getAttribute('name') === name);
+  const viewProviders = new Map([...(parse('GuiDocument.xml')?.querySelectorAll('ViewProviderData > ViewProvider') || [])]
+    .map((provider) => [provider.getAttribute('name'), provider]));
+  const objects = [...documentXml.querySelectorAll('ObjectData > Object')].map((object) => {
+    const provider = viewProviders.get(object.getAttribute('name'));
+    const visibility = property(object, 'Visibility') || property(provider, 'Visibility');
+    return {
+      file: property(object, 'Shape')?.querySelector('Part')?.getAttribute('file'),
+      visible: visibility?.querySelector('Bool')?.getAttribute('value') === 'true',
+      color: property(provider, 'ShapeColor')?.querySelector('PropertyColor')?.getAttribute('value')
+    };
+  }).filter((object) => object.file && files[object.file]);
+  const visible = objects.filter((object) => object.visible);
+
+  const group = new THREE.Group();
+  for (const object of visible.length > 0 ? visible : objects) {
+    const result = occt.ReadBrepFile(files[object.file], null);
+    if (!result.success || result.meshes.length === 0) continue;
+
+    const part = occtResultToObject(result);
+    if (object.color) {
+      // RGBA packed into an unsigned integer
+      const value = Number(object.color) >>> 0;
+      const color = new THREE.Color().setRGB(((value >>> 24) & 255) / 255, ((value >>> 16) & 255) / 255,
+                                             ((value >>> 8) & 255) / 255, THREE.SRGBColorSpace);
+      part.traverse((child) => { if (child.isMesh) child.material.color.copy(color); });
+    }
+    group.add(part);
+  }
+  if (group.children.length === 0) throw new Error('The file contains no shapes');
+  return group;
 }
 
 function formatNumber(value) {
@@ -380,6 +425,8 @@ class ModelViewer {
         return new AMFLoader(loadingManager).parse(buffer);
       case '3ds':
         return new TDSLoader(loadingManager).parse(buffer, '');
+      case 'freecad':
+        return freecadToObject(buffer, await loadOcct(this.element.dataset.occtScript, this.element.dataset.occtWasm));
       default: {
         const method = OCCT_FORMATS[this.format];
         if (!method) throw new Error(`Unsupported format: ${this.format}`);

@@ -13,11 +13,11 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **In the browser**: The files are displayed by a viewer that runs in the browser (three.js, OpenCASCADE as WebAssembly, dxf-viewer). The libraries are included in the plugin, so no internet access is needed.
 - **Files stay in Redmine**: The browser loads the file from Redmine with the same permissions as a download. No file is sent to a third party.
 - **DWG on the server**: DWG files are converted to DXF on the server with [LibreDWG](https://www.gnu.org/software/libredwg/). The conversion runs in the background right after the upload, so the preview is ready when it is opened.
-- **Thumbnails**: The thumbnails in the attachment lists are made from the image that CAD programs save in the file (Inventor, Solid Edge, 3MF, DXF, DWG). For files without image, the browser sends a snapshot of the viewer when the preview is opened for the first time by a user who can edit the attachment.
+- **Thumbnails**: The thumbnails in the attachment lists are made from the image that CAD programs save in the file (Inventor, Solid Edge, FreeCAD, 3MF, DXF, DWG). For files without image, the browser sends a snapshot of the viewer when the preview is opened for the first time by a user who can edit the attachment.
 
 ## 🌟 Features
 
-- **3D preview** – STEP (.step, .stp), IGES (.iges, .igs), BREP (.brep, .brp), STL, OBJ, 3MF, glTF (.gltf, .glb), PLY, Collada (.dae), FBX, VRML (.wrl, .vrml), AMF, 3DS
+- **3D preview** – STEP (.step, .stp), IGES (.iges, .igs), BREP (.brep, .brp), FreeCAD (.FCStd), STL, OBJ, 3MF, glTF (.gltf, .glb), PLY, Collada (.dae), FBX, VRML (.wrl, .vrml), AMF, 3DS
 - **2D preview** – DXF, and DWG converted to DXF
 - **Autodesk Inventor** (.ipt, .iam, .ipn, .idw, .ide) and **Solid Edge** (.par, .asm, .psm, .pwd, .dft) – Shows the preview image that these programs save in the file
 - **Thumbnails** – CAD attachments get thumbnails in the attachment lists, like images (with ImageMagick, if thumbnails are enabled in the Redmine settings)
@@ -74,6 +74,7 @@ The conversion runs as an Active Job. With the default queue adapter of Redmine,
 - **DWG**: LibreDWG reads older DWG versions well. Newer DWG versions (2018 and later) are only partly supported, e.g. some texts may be missing.
 - **3D solids in DXF and DWG**: 3D solids (ACIS data, e.g. `3DSOLID`) cannot be displayed. The preview shows a notice, and for drawings made of 3D solids the image saved in the file.
 - **glTF**: `.gltf` files that reference external `.bin` or texture files are not supported. Use `.glb` instead.
+- **FreeCAD**: The visible objects of the document are shown, with their color. Documents with only 2D objects (sketches, wires) cannot be displayed.
 - **Textures and animations**: Textures in separate files (e.g. of OBJ, FBX, Collada and 3DS files) are not loaded, only the colors of the materials are shown. Animated models are shown in their rest pose.
 - **Large models**: STEP and IGES files are converted to triangles in the browser. Very large models can take a while and need a lot of memory.
 - **Measuring**: Points are picked on the surface of the model or anywhere in the drawing, without snapping to edges or end points. STL, OBJ and 3MF files have no unit, so measurements are shown in "units".

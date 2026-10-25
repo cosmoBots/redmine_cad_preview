@@ -6,7 +6,7 @@ require 'zip'
 module RedmineCadPreview
   # Images of CAD attachments for the thumbnails of Redmine and the preview of
   # Inventor and Solid Edge files. The image is either saved in the file
-  # itself (Inventor, Solid Edge, 3MF, DXF, DWG), or a snapshot of the viewer that the browser sends when the
+  # itself (Inventor, Solid Edge, FreeCAD, 3MF, DXF, DWG), or a snapshot of the viewer that the browser sends when the
   # preview is opened for the first time.
   #
   # The images are kept next to the converted DWG files:
@@ -16,7 +16,7 @@ module RedmineCadPreview
   #   <digest>_<filesize>.snapshot.png  the snapshot of the viewer
   module PreviewImage
     # Formats that can contain an image
-    EMBEDDED_FORMATS = %w[inventor solid_edge 3mf dxf dwg].freeze
+    EMBEDDED_FORMATS = %w[inventor solid_edge freecad 3mf dxf dwg].freeze
     # Maximum size of a snapshot sent by the browser
     MAX_SNAPSHOT_SIZE = 2.megabytes
     # Maximum size of an image saved in a 3MF file
@@ -90,6 +90,7 @@ module RedmineCadPreview
         case format
         when 'inventor', 'solid_edge' then OleThumbnail.extract(attachment.diskfile)
         when '3mf' then read_3mf_thumbnail(attachment.diskfile)
+        when 'freecad' then read_zip_entry(attachment.diskfile, 'thumbnails/Thumbnail.png')
         when 'dxf' then DxfThumbnail.extract(attachment.diskfile)
         when 'dwg' then read_dwg_thumbnail(attachment)
         end
@@ -114,6 +115,15 @@ module RedmineCadPreview
           target = relationship&.slice(%r{Target="/?([^"]+)"}, 1)
           entry = target && zip.find_entry(target)
           entry ||= zip.entries.find {|e| e.name.match?(%r{\AMetadata/thumbnail\.(png|jpe?g)\z}i)}
+          entry.get_input_stream.read if entry && entry.size <= MAX_EMBEDDED_SIZE
+        end
+      end
+
+      # FreeCAD documents are ZIP archives with the thumbnail in
+      # thumbnails/Thumbnail.png
+      def read_zip_entry(diskfile, name)
+        Zip::File.open(diskfile) do |zip|
+          entry = zip.find_entry(name)
           entry.get_input_stream.read if entry && entry.size <= MAX_EMBEDDED_SIZE
         end
       end

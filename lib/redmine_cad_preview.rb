@@ -10,6 +10,7 @@ module RedmineCadPreview
     'step' => %w[.step .stp],
     'iges' => %w[.iges .igs],
     'brep' => %w[.brep .brp],
+    'freecad' => %w[.fcstd],
     'stl' => %w[.stl],
     'obj' => %w[.obj],
     '3mf' => %w[.3mf],
@@ -26,6 +27,9 @@ module RedmineCadPreview
     'inventor' => %w[.ipt .iam .ipn .idw .ide],
     'solid_edge' => %w[.par .asm .psm .pwd .dft]
   }.freeze
+
+  # Formats read with OpenCASCADE (occt-import-js) in the browser
+  OCCT_FORMATS = %w[step iges brep freecad].freeze
 
   # Formats that cannot be displayed in the viewer, only with the image
   # saved in the file

@@ -28,7 +28,7 @@
          <% if @cad_snapshot %>
          data-snapshot-url="<%= cad_preview_snapshot_path(@attachment) %>"
          <% end %>
-         <% if %w[step iges brep].include?(format) %>
+         <% if RedmineCadPreview::OCCT_FORMATS.include?(format) %>
          data-occt-script="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.js') %>"
          data-occt-wasm="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.wasm') %>"
          <% end %>

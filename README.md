@@ -8,10 +8,6 @@
 
 This plugin shows CAD attachments directly in Redmine: 3D models can be rotated, zoomed and panned, 2D drawings can be zoomed and panned. Instead of "No preview available", the attachment page shows an interactive viewer for issues, documents, files and wiki pages.
 
-![3D preview of a STEP assembly with a distance measurement](docs/screenshot-3d.png)
-
-![2D preview of a DWG drawing](docs/screenshot-2d.png)
-
 ## 🧠 How it works
 
 - **In the browser**: The files are displayed by a viewer that runs in the browser (three.js, OpenCASCADE as WebAssembly, dxf-viewer). The libraries are included in the plugin, so no internet access is needed.
@@ -33,6 +29,12 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **Background conversion of DWG files** – Started after the upload. A failed conversion is attempted at most twice, so opening the preview does not start a new conversion every time.
 - **Settings** – Previewed formats, maximum file size, DWG converter command and timeout
 - **No migration and no additional gems**
+
+## 📸 Screenshots
+
+| 3D model (STEP) with a distance measurement | 2D drawing (DWG) |
+| --- | --- |
+| [![3D preview of a STEP assembly with a distance measurement](docs/screenshot-3d.png)](docs/screenshot-3d.png) | [![2D preview of a DWG drawing](docs/screenshot-2d.png)](docs/screenshot-2d.png) |
 
 ## ⚙️ Plugin Configuration
 

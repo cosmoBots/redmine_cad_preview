@@ -1,0 +1,25 @@
+# Checks the JavaScript libraries of the viewer and the GitHub Actions once a
+# month. The updates of each kind are grouped into one pull request. The
+# workflow frontend.yml rebuilds the viewer in the pull requests of npm.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: monthly
+    groups:
+      frontend:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: Update the libraries of the viewer
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: Update the GitHub Actions

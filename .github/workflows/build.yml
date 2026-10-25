@@ -15,6 +15,13 @@ jobs:
         redmine: ['6.1-stable', '7.0-stable']
         db: ['postgres', 'mysql']
         include:
+          # Redmine 6.0, the lowest supported version
+          - redmine: '6.0-stable'
+            ruby: '3.3'
+            db: 'postgres'
+          - redmine: '6.0-stable'
+            ruby: '3.3'
+            db: 'mysql'
           # Redmine 7.0 mit Ruby 4.0
           - redmine: '7.0-stable'
             ruby: '4.0'

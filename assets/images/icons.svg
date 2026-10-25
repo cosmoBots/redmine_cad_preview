@@ -80,5 +80,19 @@
       <path d="M20 15h-3v6"/>
       <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1"/>
     </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--file-3d">
+      <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+      <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2"/>
+      <path d="M12 13.5l4 -1.5"/>
+      <path d="M8 11.846l4 1.654v4.5l4 -1.846v-4.308l-4 -1.846l-4 1.846"/>
+      <path d="M8 12v4.2l4 1.8"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--file-vector">
+      <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+      <path d="M8 16.5a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0"/>
+      <path d="M13 12.5a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0"/>
+      <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2"/>
+      <path d="M9.5 15a2.5 2.5 0 0 1 2.5 -2.5h1"/>
+    </symbol>
   </defs>
 </svg>

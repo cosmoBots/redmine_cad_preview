@@ -20,3 +20,7 @@ end
 unless Attachment.include?(RedmineCadPreview::AttachmentPatch)
   Attachment.include(RedmineCadPreview::AttachmentPatch)
 end
+
+unless IconsHelper.include?(RedmineCadPreview::IconsHelperPatch)
+  IconsHelper.prepend(RedmineCadPreview::IconsHelperPatch)
+end

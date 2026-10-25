@@ -10,7 +10,7 @@ import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 // Tabler icons of the viewer toolbar, in addition to the icons of Redmine
 const ICONS = ['zoom-scan', 'box', 'ruler-measure', 'angle',
                'arrows-maximize', 'arrows-minimize', 'maximize', 'minimize',
-               'file-type-png', 'file-type-pdf'];
+               'file-type-png', 'file-type-pdf', 'file-3d', 'file-vector'];
 
 const assets = new URL('../assets/', import.meta.url).pathname;
 

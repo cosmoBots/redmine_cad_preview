@@ -48,9 +48,17 @@ jobs:
           # Nur für den Release-Text, die CHANGELOG.md wird nicht verändert
           echo -e "## ${{ env.version }} ($DATE)\n$COMMITS" > release_notes.md
 
+      # Only the files needed to run the plugin. The sources of the JavaScript
+      # (frontend/), the tests, the documentation images and the Gemfile (only
+      # used by the tests) are not included.
       - name: Archive
         run: |
-          cd ..; zip -r ${{ env.filename }}.zip ${{ env.plugin }}/ -x "*.git*" "*/docs/*" "*/test/*" "*/release_notes.md"
+          cd ..
+          zip -r ${{ env.filename }}.zip \
+            ${{ env.plugin }}/app ${{ env.plugin }}/assets ${{ env.plugin }}/config \
+            ${{ env.plugin }}/lib ${{ env.plugin }}/licenses ${{ env.plugin }}/init.rb \
+            ${{ env.plugin }}/LICENSE ${{ env.plugin }}/THIRD_PARTY_NOTICES.md \
+            ${{ env.plugin }}/README.md ${{ env.plugin }}/CHANGELOG.md
           mv ${{ env.filename }}.zip ${{ env.plugin }}/
 
       - name: Release

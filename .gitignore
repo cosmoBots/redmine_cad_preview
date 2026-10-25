@@ -58,3 +58,6 @@ README.html
 
 # Frontend build
 /frontend/node_modules/
+
+# Editor
+/.ruby-lsp/

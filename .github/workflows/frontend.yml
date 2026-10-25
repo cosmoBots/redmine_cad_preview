@@ -1,0 +1,50 @@
+name: frontend
+on:
+  pull_request:
+    paths:
+      - 'frontend/**'
+
+# The pull requests of Dependabot get the rebuilt viewer committed
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DEPENDABOT: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The branch, so that the rebuilt files can be pushed to it
+          ref: ${{ github.actor == 'dependabot[bot]' && github.head_ref || '' }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build the viewer
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Commit the rebuilt viewer and the versions in THIRD_PARTY_NOTICES.md
+        if: env.DEPENDABOT == 'true'
+        run: |
+          node frontend/notices.mjs --write
+          git add assets THIRD_PARTY_NOTICES.md
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Rebuild the viewer"
+          git push
+
+      # Other pull requests must contain the rebuilt files
+      - name: Check that the built files and THIRD_PARTY_NOTICES.md are up to date
+        if: env.DEPENDABOT != 'true'
+        run: |
+          node frontend/notices.mjs
+          git diff --exit-code -- assets

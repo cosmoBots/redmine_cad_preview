@@ -129,12 +129,12 @@ The versions are pinned in `frontend/package.json` (exact versions) and `fronten
 | `@tabler/icons` | Toolbar and file icons | `assets/images/icons.svg` |
 | `esbuild` | Bundler (only for the build) | – |
 
-To update a library:
+Dependabot checks the libraries once a month and opens a pull request with the updates. The workflow `frontend.yml` rebuilds the viewer in this pull request and updates the versions in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Before merging:
 
-1. `npm outdated` shows the newer versions.
-2. Change the version in `package.json` and run `npm install` and `npm run build`.
-3. Update the version in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and the license text in `licenses/` if it changed.
-4. Check the preview of all formats, as `dxf-viewer` is used with a patch of its parser (counting 3D solids, see `frontend/src/cad_preview.js`).
+1. Check the license texts in `licenses/` if a license changed.
+2. Check the preview of all formats, as `dxf-viewer` is used with a patch of its parser (counting 3D solids, see `frontend/src/cad_preview.js`).
+
+To update a library by hand, change the version in `package.json`, then run `npm install`, `npm run build` and `node notices.mjs --write`. Other pull requests that change `frontend/` must contain the rebuilt files, which `frontend.yml` checks.
 
 ## ❌ Uninstall
 

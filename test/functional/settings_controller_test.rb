@@ -13,6 +13,11 @@ class CadPreviewSettingsControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = 1
   end
 
+  # The settings saved here must not remain cached for the other tests
+  def teardown
+    Setting.clear_cache
+  end
+
   def test_plugin_settings
     get(:plugin, :params => {:id => 'redmine_cad_preview'})
     assert_response :success

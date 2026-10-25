@@ -16,6 +16,8 @@ class CadPreviewIssuesControllerTest < Redmine::ControllerTest
   end
 
   def test_show_should_display_cad_file_icons
+    skip 'Redmine passes the filename for the file type icons since trunk (after 7.0)' unless core_passes_filename?
+
     create_cad_attachment('model.step')
     create_cad_attachment('drawing.dxf')
 
@@ -30,6 +32,8 @@ class CadPreviewIssuesControllerTest < Redmine::ControllerTest
   end
 
   def test_show_should_not_display_cad_file_icons_for_disabled_formats
+    skip 'Redmine passes the filename for the file type icons since trunk (after 7.0)' unless core_passes_filename?
+
     create_cad_attachment('model.step')
 
     with_cad_settings('formats' => %w[dxf]) do
@@ -38,5 +42,11 @@ class CadPreviewIssuesControllerTest < Redmine::ControllerTest
     assert_select 'div.attachments a.icon-attachment', :text => /model\.step/ do
       assert_select 'use[href*="redmine_cad_preview"]', 0
     end
+  end
+
+  private
+
+  def core_passes_filename?
+    IconsHelper.instance_method(:icon_for_mime_type).super_method.arity != 1
   end
 end

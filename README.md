@@ -25,7 +25,7 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **2D preview** – DXF, and DWG converted to DXF
 - **Autodesk Inventor** (.ipt, .iam, .ipn, .idw, .ide) – Shows the preview image that Inventor saves in the file
 - **Thumbnails** – CAD attachments get thumbnails in the attachment lists, like images (with ImageMagick, if thumbnails are enabled in the Redmine settings)
-- **File icons** – 3D models and 2D drawings get their own icons in the attachment lists. Icons of the theme are used first.
+- **File icons** – 3D models and 2D drawings get their own icons in the attachment lists, from Redmine 7.0 (which shows file type icons there). Redmine 7.0 only passes the content type, so only files with a CAD content type get the icons there, e.g. DWG, DXF, STL and IGES. Redmine trunk also passes the filename, so all CAD files get the icons. Icons of the theme are used first.
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
 - **Measuring** – Overall dimensions of the model or drawing, distance between two points and angle between three points (without snapping). The unit is taken from the file where it is known (STEP, IGES, BREP: mm, glTF: m, DXF: `$INSUNITS`).
 - **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library.

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RedmineCadPreview
-  VERSION = '0.3.0'
+  VERSION = '1.0.0'
 
   # Formats and file extensions. DWG files are converted to DXF on the server.
   # Inventor, Solid Edge and SolidWorks files are shown with the preview image

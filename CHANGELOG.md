@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.0 (2026-10-25)
+* First stable release, with all changes of the versions 0.1.0 to 0.3.0 below
+* fix: a test of an Inventor file could fail depending on the order of the tests
+* chore: updated GitHub Actions (checkout, setup-node, action-gh-release)
+
 ## v0.3.0 (unreleased)
 * feat: 3D preview of FreeCAD documents (.FCStd)
 * feat: 3D preview of PLY, Collada (.dae), FBX, VRML (.wrl), AMF and 3DS files

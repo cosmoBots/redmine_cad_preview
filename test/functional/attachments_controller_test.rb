@@ -142,7 +142,9 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
 
     get(:thumbnail, :params => {:id => attachment.id})
     assert_response :success
-    assert_equal 'image/png', response.media_type
+    # Redmine 6.0 sends thumbnails with the content type of the attachment,
+    # browsers display them by their content
+    assert response.body.b.start_with?("\x89PNG".b)
   end
 
   def test_show_should_request_snapshot_for_attachment_without_image

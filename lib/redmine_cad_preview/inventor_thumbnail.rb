@@ -1,44 +1,15 @@
 # frozen_string_literal: true
 
-require 'fileutils'
-
 module RedmineCadPreview
   # Reads the preview image that Autodesk Inventor saves in its files (.ipt,
   # .iam, .ipn, .idw, .ide). Inventor files are OLE compound files. The image
   # is a PNG in the thumbnail property of the "Inventor Summary Information"
   # property set. The model itself cannot be read without Inventor.
-  #
-  # The image is kept next to the converted DWG files:
-  #
-  #   <digest>_<filesize>.png
   module InventorThumbnail
     # Stream name of the "Inventor Summary Information" property set
     PROPERTY_SET = "\u0005Zrxrt4arFafyu34gYa3l3ohgHg"
     PNG_START = "\x89PNG\r\n\x1A\n".b
     PNG_END = "IEND\xAE\x42\x60\x82".b
-
-    def self.cache_path(attachment)
-      File.join(DwgConverter.storage_path, "#{attachment.digest}_#{attachment.filesize}.png")
-    end
-
-    # Returns the path of the preview image of the attachment, or nil if the
-    # file has no preview image
-    def self.png_for(attachment)
-      path = cache_path(attachment)
-      return path if File.file?(path)
-
-      png = extract(attachment.diskfile)
-      return nil unless png
-
-      FileUtils.mkdir_p(File.dirname(path))
-      temp = "#{path}.#{Process.pid}.tmp"
-      File.binwrite(temp, png)
-      File.rename(temp, path)
-      path
-    rescue StandardError => e
-      Rails.logger.error("Could not read the preview image of #{attachment.disk_filename}: #{e.message}")
-      nil
-    end
 
     # Returns the PNG data of the preview image of the file, or nil
     def self.extract(path)
@@ -48,10 +19,6 @@ module RedmineCadPreview
 
       finish = data.index(PNG_END, start)
       finish ? data[start, finish + PNG_END.size - start] : nil
-    end
-
-    def self.delete(attachment)
-      FileUtils.rm_f(cache_path(attachment))
     end
 
     # Minimal reader for OLE compound files ([MS-CFB]) that reads the streams

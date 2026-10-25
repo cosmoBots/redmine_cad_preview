@@ -103,6 +103,29 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_equal 'image/png', response.media_type
   end
 
+  def test_show_should_request_snapshot_for_attachment_without_image
+    attachment = create_cad_attachment('model.step')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview[data-snapshot-url=?]', "/cad_previews/#{attachment.id}/snapshot"
+  end
+
+  def test_show_should_not_request_snapshot_for_attachment_with_snapshot
+    attachment = create_cad_attachment('model.step')
+    RedmineCadPreview::PreviewImage.store_snapshot(attachment, File.binread(File.join(FIXTURES_DIR, 'thumbnail.png')))
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview:not([data-snapshot-url])'
+  end
+
+  def test_show_should_not_request_snapshot_from_user_who_cannot_edit
+    attachment = create_cad_attachment('model.step')
+    @request.session[:user_id] = nil
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview:not([data-snapshot-url])'
+  end
+
   def test_show_dwg_file_with_available_converter
     attachment = create_cad_attachment('drawing.dwg')
 

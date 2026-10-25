@@ -10,6 +10,8 @@
 //   data-error        Message shown when the file cannot be displayed
 //   data-i18n         JSON object with the labels of the measurements
 //   data-filename     Name of the file, used for the downloaded images
+//   data-snapshot-url URL to send the snapshot for the thumbnail to (only for
+//                     attachments without thumbnail and users who can edit them)
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -32,6 +34,8 @@ const CLICK_TOLERANCE = 4;
 const MEASUREMENT_COLOR = '#e8590c';
 // A4 in PDF points, and the margin around the image
 const PDF_PAGE = { long: 842, short: 595, margin: 28 };
+// Maximum size of the snapshot for the thumbnail (the largest Redmine thumbnail)
+const SNAPSHOT_SIZE = 800;
 
 let occtPromise = null;
 
@@ -529,6 +533,26 @@ async function downloadView(element, viewer, measurement, type) {
   }
 }
 
+// Sends a snapshot of the view after loading to Redmine, which uses it for
+// the thumbnail of the attachment
+async function sendSnapshot(element, viewer) {
+  const source = viewer.canvas;
+  const scale = Math.min(1, SNAPSHOT_SIZE / Math.max(source.width, source.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(source.width * scale);
+  canvas.height = Math.round(source.height * scale);
+  viewer.render();
+  canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
+
+  const token = document.querySelector('meta[name="csrf-token"]')?.content;
+  await fetch(element.dataset.snapshotUrl, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'image/png', 'X-CSRF-Token': token || '' },
+    body: await canvasToBlob(canvas, 'image/png')
+  });
+}
+
 function readMaximized() {
   try {
     return window.localStorage.getItem(MAXIMIZED_STORAGE_KEY) === 'true';
@@ -618,6 +642,9 @@ async function initialize(element) {
     onClick(viewer.canvas, (event) => measurement.click(event.clientX, event.clientY));
     showDimensions(element, viewer, i18n);
     status.hidden = true;
+    if (element.dataset.snapshotUrl) {
+      sendSnapshot(element, viewer).catch((error) => console.error('CAD preview snapshot:', error));
+    }
   } catch (error) {
     console.error('CAD preview:', error);
     status.textContent = element.dataset.error;

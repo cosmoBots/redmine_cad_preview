@@ -4,21 +4,20 @@ module RedmineCadPreview
   module AttachmentPatch
     def self.included(base)
       base.prepend(Thumbnail)
-      base.after_commit :convert_cad_preview_later, :on => :create
+      base.after_commit :prepare_cad_preview_later, :on => :create
       base.after_commit :delete_cad_preview, :on => :destroy
     end
 
-    # Thumbnails of Inventor files, made from the preview image in the file
+    # Thumbnails of CAD files, made from the image saved in the file or from
+    # the snapshot of the viewer (see PreviewImage)
     module Thumbnail
       def thumbnailable?
-        super || (cad_inventor_file? && Redmine::Thumbnail.convert_available?)
+        super || (Redmine::Thumbnail.convert_available? && cad_preview_image.present?)
       end
 
       def thumbnail(options={})
-        return super unless cad_inventor_file?
-
-        source = RedmineCadPreview::InventorThumbnail.png_for(self)
-        return nil unless source && thumbnailable?
+        source = cad_preview_image
+        return super unless source && Redmine::Thumbnail.convert_available?
 
         size = options[:size].to_i
         size = size > 0 ? [(size / 50.0).ceil * 50, 800].min : Setting.thumbnails_size.to_i
@@ -31,24 +30,26 @@ module RedmineCadPreview
 
       private
 
-      def cad_inventor_file?
-        RedmineCadPreview.format_of(filename) == 'inventor' && RedmineCadPreview.previewable?(self)
+      def cad_preview_image
+        return nil unless RedmineCadPreview.format_of(filename) && RedmineCadPreview.previewable?(self)
+
+        RedmineCadPreview::PreviewImage.path(self)
       end
     end
 
     private
 
-    def convert_cad_preview_later
-      return unless RedmineCadPreview.format_of(filename) == 'dwg' && RedmineCadPreview.previewable?(self)
+    def prepare_cad_preview_later
+      return unless RedmineCadPreview::CadPreviewJob.needed?(self)
 
-      RedmineCadPreview::DwgConversionJob.perform_later(id)
+      RedmineCadPreview::CadPreviewJob.perform_later(id)
     rescue StandardError => e
-      Rails.logger.error("Could not schedule the CAD preview conversion of #{disk_filename}: #{e.message}")
+      Rails.logger.error("Could not schedule the CAD preview of #{disk_filename}: #{e.message}")
     end
 
     def delete_cad_preview
       RedmineCadPreview::DwgConverter.delete(self)
-      RedmineCadPreview::InventorThumbnail.delete(self)
+      RedmineCadPreview::PreviewImage.delete(self)
     rescue StandardError => e
       Rails.logger.error("Could not remove CAD preview for #{disk_filename}: #{e.message}")
     end

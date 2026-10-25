@@ -52,6 +52,33 @@ class CadPreviewsControllerTest < Redmine::ControllerTest
     assert_response :not_found
   end
 
+  def test_snapshot
+    attachment = create_cad_attachment('model.step')
+    @request.session[:user_id] = 2
+
+    post(:snapshot, :params => {:id => attachment.id}, :body => thumbnail)
+    assert_response :no_content
+    assert_equal thumbnail, File.binread(RedmineCadPreview::PreviewImage.snapshot_path(attachment))
+  end
+
+  def test_snapshot_should_reject_other_data
+    attachment = create_cad_attachment('model.step')
+    @request.session[:user_id] = 2
+
+    post(:snapshot, :params => {:id => attachment.id}, :body => '<svg/>')
+    assert_equal 422, response.status
+    assert_nil RedmineCadPreview::PreviewImage.path(attachment)
+  end
+
+  def test_snapshot_should_require_edit_permission
+    attachment = create_cad_attachment('model.step')
+    # Anonymous can view the issue but not edit it
+
+    post(:snapshot, :params => {:id => attachment.id}, :body => thumbnail)
+    assert_response :redirect
+    assert_nil RedmineCadPreview::PreviewImage.path(attachment)
+  end
+
   def test_file_should_require_permission
     attachment = create_cad_attachment('model.step', :container => Issue.find(4)) # private project
 
@@ -102,5 +129,11 @@ class CadPreviewsControllerTest < Redmine::ControllerTest
                    {:controller => 'cad_previews', :action => 'file', :id => '1'})
     assert_routing({:method => 'get', :path => '/cad_previews/1/dxf'},
                    {:controller => 'cad_previews', :action => 'dxf', :id => '1'})
+  end
+
+  private
+
+  def thumbnail
+    File.binread(File.join(FIXTURES_DIR, 'thumbnail.png'))
   end
 end

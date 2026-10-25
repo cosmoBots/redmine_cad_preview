@@ -82,15 +82,15 @@ class CadPreviewDwgConverterTest < ActiveSupport::TestCase
     end
   end
 
-  def test_upload_of_other_file_should_not_schedule_a_conversion
-    RedmineCadPreview::DwgConversionJob.expects(:perform_later).never
+  def test_upload_of_file_without_preview_work_should_not_schedule_a_job
+    RedmineCadPreview::CadPreviewJob.expects(:perform_later).never
     with_fake_dwg2dxf do
       create_cad_attachment('model.step', :convert => true)
     end
   end
 
-  def test_conversion_job_with_missing_attachment
-    assert_nothing_raised { RedmineCadPreview::DwgConversionJob.perform_now(99999) }
+  def test_preview_job_with_missing_attachment
+    assert_nothing_raised { RedmineCadPreview::CadPreviewJob.perform_now(99999) }
   end
 
   def test_conversion_should_time_out

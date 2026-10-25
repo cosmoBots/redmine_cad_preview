@@ -10,7 +10,7 @@ module RedmineCadPreview
   # preview of Redmine converts Office documents with Pandoc.
   #
   # The conversion runs in the background after the upload (see
-  # DwgConversionJob). Its state is kept in files next to the converted file:
+  # CadPreviewJob). Its state is kept in files next to the converted file:
   #
   #   <digest>_<filesize>.dxf     the converted file
   #   <digest>_<filesize>.failed  the number of failed attempts
@@ -93,37 +93,41 @@ module RedmineCadPreview
 
       FileUtils.mkdir_p(File.dirname(target))
       temporary = "#{target}.#{Process.pid}.tmp.dxf"
+      # dwg2dxf may exit with an error code for recoverable warnings, so the
+      # result is checked by the output file.
       args = command_arguments + ['-y', '-o', temporary, source.to_s]
-      pid = nil
-
-      begin
-        Timeout.timeout(timeout) do
-          pid = Process.spawn(*args, out: File::NULL, err: File::NULL, pgroup: true)
-          _waited_pid, status = Process.wait2(pid)
-          pid = nil
-
-          # dwg2dxf may exit with an error code for recoverable warnings,
-          # so the result is checked by the output file.
-          unless File.size?(temporary)
-            logger.error("DWG to DXF conversion failed (#{status.exitstatus}):\nCommand: #{args.shelljoin}")
-            return nil
-          end
-        end
-
-        File.rename(temporary, target)
-        target
-      rescue Timeout::Error
-        terminate_process_group(pid)
-        logger.error("DWG to DXF conversion timed out:\nCommand: #{args.shelljoin}")
-        nil
-      rescue StandardError => e
-        terminate_process_group(pid)
-        logger.error("DWG to DXF conversion failed:\nCommand: #{args.shelljoin}\nException was: #{e.class}: #{e.message}")
-        nil
-      ensure
-        FileUtils.rm_f(temporary)
+      status = run(args, 'DWG to DXF conversion')
+      unless File.size?(temporary)
+        logger.error("DWG to DXF conversion failed (#{status&.exitstatus}):\nCommand: #{args.shelljoin}") if status
+        return nil
       end
+
+      File.rename(temporary, target)
+      target
+    ensure
+      FileUtils.rm_f(temporary) if temporary
     end
+
+    # Runs the command with the timeout. Returns the exit status, or nil if
+    # the command timed out or could not be run.
+    def self.run(args, description)
+      pid = nil
+      Timeout.timeout(timeout) do
+        pid = Process.spawn(*args, out: File::NULL, err: File::NULL, pgroup: true)
+        _waited_pid, status = Process.wait2(pid)
+        pid = nil
+        status
+      end
+    rescue Timeout::Error
+      terminate_process_group(pid)
+      logger.error("#{description} timed out:\nCommand: #{args.shelljoin}")
+      nil
+    rescue StandardError => e
+      terminate_process_group(pid)
+      logger.error("#{description} failed:\nCommand: #{args.shelljoin}\nException was: #{e.class}: #{e.message}")
+      nil
+    end
+    private_class_method :run
 
     # Removes the converted file and the state files of the attachment
     def self.delete(attachment)

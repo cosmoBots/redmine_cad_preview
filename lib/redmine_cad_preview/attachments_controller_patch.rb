@@ -6,6 +6,10 @@ module RedmineCadPreview
       if request.format.html? && @attachment && RedmineCadPreview.previewable?(@attachment)
         prepare_cad_preview_pagination
         @cad_format = RedmineCadPreview.format_of(@attachment.filename)
+        # The image is read here for files uploaded before the plugin was installed
+        @cad_image = RedmineCadPreview::PreviewImage.extract(@attachment)
+        @cad_snapshot = @cad_image.nil? && RedmineCadPreview::PreviewImage.path(@attachment).nil? &&
+                        @attachment.editable?
         render :action => 'cad_preview'
         return
       end

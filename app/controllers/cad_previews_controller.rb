@@ -5,6 +5,7 @@
 # increase the download counter of the attachment.
 class CadPreviewsController < ApplicationController
   before_action :find_attachment, :authorize_attachment
+  before_action :authorize_snapshot, :only => :snapshot
 
   # Sends the attachment
   def file
@@ -21,9 +22,9 @@ class CadPreviewsController < ApplicationController
     end
   end
 
-  # Sends the preview image saved in an Inventor file
+  # Sends the image saved in the file (Inventor, 3MF, DXF, DWG)
   def image
-    path = RedmineCadPreview::InventorThumbnail.png_for(@attachment)
+    path = RedmineCadPreview::PreviewImage.extract(@attachment)
     return render_404 unless path
 
     if stale?(:etag => @attachment.digest, :template => false)
@@ -32,7 +33,24 @@ class CadPreviewsController < ApplicationController
     end
   end
 
+  # Stores the snapshot of the viewer that is used for the thumbnail of the
+  # attachment. The browser sends it when the preview of an attachment
+  # without image is opened.
+  def snapshot
+    data = request.body.read(RedmineCadPreview::PreviewImage::MAX_SNAPSHOT_SIZE + 1)
+    if RedmineCadPreview::PreviewImage.store_snapshot(@attachment, data.to_s)
+      head :no_content
+    else
+      head 422 # rubocop:disable Rails/HttpStatus -- the name of the status differs between Rack versions
+    end
+  end
+
   private
+
+  # Only users who can edit the attachment can set its thumbnail
+  def authorize_snapshot
+    @attachment.editable? ? true : deny_access
+  end
 
   def find_attachment
     @attachment = Attachment.find(params[:id])

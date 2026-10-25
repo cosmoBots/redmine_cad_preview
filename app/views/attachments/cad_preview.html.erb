@@ -2,7 +2,7 @@
   <% format = @cad_format == 'dwg' ? 'dxf' : @cad_format %>
   <% dwg_state = RedmineCadPreview::DwgConverter.state(@attachment) if @cad_format == 'dwg' %>
   <% if @cad_format == 'inventor' %>
-    <% if RedmineCadPreview::InventorThumbnail.png_for(@attachment) %>
+    <% if @cad_image %>
       <div class="cad-preview-image">
         <%= image_tag cad_preview_image_path(@attachment), :alt => @attachment.filename %>
       </div>
@@ -22,6 +22,9 @@
          data-format="<%= format %>"
          data-error="<%= l(:text_cad_preview_error) %>"
          data-filename="<%= @attachment.filename %>"
+         <% if @cad_snapshot %>
+         data-snapshot-url="<%= cad_preview_snapshot_path(@attachment) %>"
+         <% end %>
          <% if %w[step iges brep].include?(format) %>
          data-occt-script="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.js') %>"
          data-occt-wasm="<%= asset_path('plugin_assets/redmine_cad_preview/occt-import-js.wasm') %>"

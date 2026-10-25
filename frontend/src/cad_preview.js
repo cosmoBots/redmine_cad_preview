@@ -3,7 +3,8 @@
 // The viewer is configured by the data attributes of the element
 // [data-cad-preview]:
 //   data-url          URL of the file (or of the DXF converted from a DWG file)
-//   data-format       step, iges, brep, stl, obj, 3mf, gltf, glb or dxf
+//   data-format       step, iges, brep, stl, obj, 3mf, gltf, glb, ply, dae, fbx,
+//                     vrml, amf, 3ds or dxf
 //   data-occt-script  URL of occt-import-js.js (STEP, IGES and BREP only)
 //   data-occt-wasm    URL of occt-import-js.wasm (STEP, IGES and BREP only)
 //   data-fonts        JSON array of font URLs (DXF only)
@@ -21,10 +22,16 @@ import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+import { VRMLLoader } from 'three/addons/loaders/VRMLLoader.js';
+import { AMFLoader } from 'three/addons/loaders/AMFLoader.js';
+import { TDSLoader } from 'three/addons/loaders/TDSLoader.js';
 import { DxfViewer } from 'dxf-viewer';
 import DxfParser from 'dxf-viewer/src/parser/DxfParser.js';
 
-const Z_UP_FORMATS = ['step', 'iges', 'brep', 'stl', '3mf'];
+const Z_UP_FORMATS = ['step', 'iges', 'brep', 'stl', '3mf', 'amf', '3ds'];
 const OCCT_FORMATS = { step: 'ReadStepFile', iges: 'ReadIgesFile', brep: 'ReadBrepFile' };
 // occt-import-js returns millimeters, glTF uses meters, the other formats have no unit
 const MODEL_UNITS = { step: 'mm', iges: 'mm', brep: 'mm', gltf: 'm', glb: 'm' };
@@ -61,6 +68,13 @@ DxfParser.prototype.registerEntityHandler = function register(handlerType) {
     if (!this._entityHandlers[handler.ForEntityName]) registerEntityHandler.call(this, handler);
   }
 };
+
+// Textures and other files referenced by a model (e.g. by FBX, Collada or
+// 3DS files) are not loaded, as only the attachment itself is available. A
+// white pixel is loaded instead, so that the colors of the materials are shown.
+const WHITE_PIXEL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC';
+const loadingManager = new THREE.LoadingManager();
+loadingManager.setURLModifier((url) => (/^(data|blob):/.test(url) ? url : WHITE_PIXEL));
 
 let occtPromise = null;
 
@@ -119,6 +133,30 @@ function hasZeroNormals(geometry) {
     if (normals[i] === 0 && normals[i + 1] === 0 && normals[i + 2] === 0) return true;
   }
   return false;
+}
+
+// Shows animated models in their rest pose and removes the backgrounds of
+// VRML scenes, which would be fitted to the view instead of the model
+function prepareObject(object) {
+  const replacements = [];
+  object.traverse((child) => {
+    if (child.isSkinnedMesh) {
+      replacements.push([child, new THREE.Mesh(child.geometry, child.material)]);
+    } else if (child.isMesh && [].concat(child.material).every((m) => m.side === THREE.BackSide && !m.depthTest)) {
+      replacements.push([child, null]);
+    }
+  });
+  for (const [child, mesh] of replacements) {
+    if (mesh) {
+      mesh.name = child.name;
+      mesh.position.copy(child.position);
+      mesh.quaternion.copy(child.quaternion);
+      mesh.scale.copy(child.scale);
+      child.parent.add(mesh);
+    }
+    child.parent.remove(child);
+  }
+  return object;
 }
 
 function formatNumber(value) {
@@ -289,7 +327,7 @@ class ModelViewer {
 
   async load() {
     const buffer = await fetchFile(this.element.dataset.url);
-    this.object = await this.parse(buffer);
+    this.object = prepareObject(await this.parse(buffer));
     this.scene.add(this.object);
     this.fit();
     this.renderer.setAnimationLoop(() => {
@@ -316,9 +354,32 @@ class ModelViewer {
         return new ThreeMFLoader().parse(buffer);
       case 'gltf':
       case 'glb': {
-        const gltf = await new GLTFLoader().parseAsync(buffer, '');
+        const gltf = await new GLTFLoader(loadingManager).parseAsync(buffer, '');
         return gltf.scene;
       }
+      case 'ply': {
+        const geometry = new PLYLoader().parse(buffer);
+        if (!geometry.index && geometry.getAttribute('position').count % 3 !== 0) {
+          // Point cloud without faces
+          return new THREE.Points(geometry, new THREE.PointsMaterial({
+            size: 2, sizeAttenuation: false, vertexColors: geometry.hasAttribute('color'), color: geometry.hasAttribute('color') ? 0xffffff : DEFAULT_COLOR
+          }));
+        }
+        if (!geometry.hasAttribute('normal')) geometry.computeVertexNormals();
+        const material = defaultMaterial(geometry.hasAttribute('color') ? 0xffffff : DEFAULT_COLOR);
+        material.vertexColors = geometry.hasAttribute('color');
+        return new THREE.Mesh(geometry, material);
+      }
+      case 'dae':
+        return new ColladaLoader(loadingManager).parse(new TextDecoder().decode(buffer), '').scene;
+      case 'fbx':
+        return new FBXLoader(loadingManager).parse(buffer, '');
+      case 'vrml':
+        return new VRMLLoader(loadingManager).parse(new TextDecoder().decode(buffer), '');
+      case 'amf':
+        return new AMFLoader(loadingManager).parse(buffer);
+      case '3ds':
+        return new TDSLoader(loadingManager).parse(buffer, '');
       default: {
         const method = OCCT_FORMATS[this.format];
         if (!method) throw new Error(`Unsupported format: ${this.format}`);

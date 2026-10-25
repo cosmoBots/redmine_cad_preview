@@ -54,6 +54,14 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_show_ply_file
+    attachment = create_cad_attachment('model.ply')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_select 'div.cad-preview[data-format=ply]:not([data-occt-script])'
+    assert_select 'a[data-cad-action=wireframe]'
+  end
+
   def test_show_stl_file_should_not_load_occt
     attachment = create_cad_attachment('model.stl')
 

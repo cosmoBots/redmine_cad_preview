@@ -4,7 +4,7 @@ Redmine::Plugin.register :redmine_cad_preview do
   name 'Redmine CAD Preview'
   author 'Florian Walchshofer'
   author_url 'https://github.com/flowalchs/'
-  description 'Interactive preview of CAD attachments (STEP, IGES, BREP, STL, OBJ, 3MF, glTF, DXF, DWG, Inventor, Solid Edge) in the browser'
+  description 'Interactive preview of CAD attachments (STEP, IGES, STL, 3MF, glTF, DXF, DWG and more, preview images of Inventor and Solid Edge) in the browser'
   url 'https://github.com/flowalchs/redmine_cad_preview/'
   version RedmineCadPreview::VERSION
   requires_redmine :version_or_higher => '6.0.0'

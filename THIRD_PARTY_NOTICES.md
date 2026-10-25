@@ -6,7 +6,7 @@ its own license. The license texts are in [licenses/](licenses).
 
 | Software | Version | License | Used for | Source |
 | --- | --- | --- | --- | --- |
-| [three.js](https://threejs.org/) | 0.186.1 | MIT | 3D viewer, loaders for STL, OBJ, 3MF and glTF | https://github.com/mrdoob/three.js |
+| [three.js](https://threejs.org/) | 0.186.1 | MIT | 3D viewer, loaders for STL, OBJ, 3MF, glTF, PLY, Collada, FBX, VRML, AMF and 3DS | https://github.com/mrdoob/three.js |
 | [occt-import-js](https://github.com/kovacsv/occt-import-js) | 0.0.23 | LGPL-2.1 | Reading STEP, IGES and BREP files (WebAssembly) | https://github.com/kovacsv/occt-import-js |
 | [Open CASCADE Technology](https://dev.opencascade.org/) | (in occt-import-js) | LGPL-2.1 with exception | CAD kernel of occt-import-js | https://github.com/Open-Cascade-SAS/OCCT |
 | [dxf-viewer](https://github.com/vagran/dxf-viewer) | 1.0.50 | MPL-2.0 | DXF viewer | https://github.com/vagran/dxf-viewer |

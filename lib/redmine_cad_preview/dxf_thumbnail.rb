@@ -19,7 +19,7 @@ module RedmineCadPreview
       if data.start_with?(PNG_SIGNATURE)
         data
       elsif data.unpack1('V') == BITMAP_INFO_HEADER_SIZE
-        bitmap_file(data)
+        Bitmap.from_dib(data)
       else
         from_dwg_preview(data)
       end
@@ -60,25 +60,8 @@ module RedmineCadPreview
       return nil if image.blank?
 
       # The last bytes of the image can be missing in the converted file
-      type == PNG ? image : bitmap_file(image.ljust(size, "\0".b))
+      type == PNG ? image : Bitmap.from_dib(image.ljust(size, "\0".b))
     end
     private_class_method :from_dwg_preview
-
-    # Adds the file header to a bitmap without it (DIB)
-    def self.bitmap_file(dib)
-      header_size = dib.unpack1('V')
-      bits = dib[14, 2].unpack1('v')
-      used_colors = dib[32, 4].unpack1('V')
-      colors =
-        if used_colors.positive?
-          used_colors
-        elsif bits <= 8
-          1 << bits
-        else
-          0
-        end
-      ['BM', 14 + dib.bytesize, 0, 14 + header_size + (colors * 4)].pack('a2VVV') + dib
-    end
-    private_class_method :bitmap_file
   end
 end

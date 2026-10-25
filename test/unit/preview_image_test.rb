@@ -43,6 +43,11 @@ class CadPreviewPreviewImageTest < ActiveSupport::TestCase
     assert_equal 'BM', File.binread(RedmineCadPreview::PreviewImage.extract(attachment), 2)
   end
 
+  def test_extract_from_solidworks_file
+    attachment = create_cad_attachment('part.sldprt')
+    assert_equal thumbnail, File.binread(RedmineCadPreview::PreviewImage.extract(attachment))
+  end
+
   def test_extract_from_freecad_file
     attachment = create_cad_attachment('thumbnail.FCStd')
     assert_equal thumbnail, File.binread(RedmineCadPreview::PreviewImage.extract(attachment))

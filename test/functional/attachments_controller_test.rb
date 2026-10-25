@@ -108,6 +108,15 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'p.cad-preview-hint', :text => /from Solid Edge/
   end
 
+  def test_show_solidworks_file
+    attachment = create_cad_attachment('part.sldprt')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_response :success
+    assert_select '.cad-preview-image img[src=?]', "/cad_previews/#{attachment.id}/image"
+    assert_select 'p.cad-preview-hint', :text => /from SolidWorks/
+  end
+
   def test_show_assembler_source_file_should_not_be_previewed_as_solid_edge_file
     attachment = create_cad_attachment('notes.txt', :as => 'boot.asm')
 

@@ -7,6 +7,9 @@
 #   files saved by Inventor
 # * part.par: a minimal OLE compound file with the "SummaryInformation"
 #   property set that contains a bitmap, like the files saved by Solid Edge
+# * part.sldprt: a SolidWorks file (2015 and later) with the PreviewPNG
+#   section; part_2014.sldprt: an OLE compound file with the PreviewPNG
+#   stream, like the files of SolidWorks 2014 and earlier
 # * thumbnail.3mf: a 3MF file with a thumbnail
 # * thumbnail.FCStd: a FreeCAD document with a thumbnail
 # * thumbnail.dxf: a DXF file with a bitmap in the THUMBNAILIMAGE section,
@@ -19,6 +22,7 @@
 
 require 'fileutils'
 require 'zip'
+require 'zlib'
 
 SECTOR_SIZE = 512
 FREE = 0xFFFFFFFF
@@ -150,3 +154,15 @@ Zip::File.open(path, create: true) do |zip|
   zip.get_output_stream('Document.xml') {|f| f.write(%(<?xml version='1.0' encoding='utf-8'?>\n<Document SchemaVersion="4"/>\n))}
   zip.get_output_stream('thumbnails/Thumbnail.png') {|f| f.write(png)}
 end
+
+# SolidWorks 2015 and later: sections with the names with swapped nibbles
+# and the data compressed with deflate
+def solidworks_section(name, data)
+  compressed = Zlib::Deflate.new(Zlib::DEFAULT_COMPRESSION, -Zlib::MAX_WBITS).deflate(data, Zlib::FINISH)
+  swapped = name.bytes.map {|byte| ((byte << 4) | (byte >> 4)) & 0xFF}.pack('C*')
+  "\x14\x00\x06\x00\x08\x00".b + [0, 0, compressed.bytesize, data.bytesize, swapped.bytesize].pack('V5') + swapped + compressed
+end
+
+File.binwrite(File.join(FIXTURES, 'part.sldprt'),
+              solidworks_section('Contents/Config-0', 'model data') + solidworks_section('PreviewPNG', png))
+File.binwrite(File.join(FIXTURES, 'part_2014.sldprt'), compound_file(png, 'PreviewPNG'))

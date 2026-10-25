@@ -25,5 +25,6 @@ en:
   label_cad_preview_units: "units"
   text_cad_preview_inventor_image: "Preview image saved in the Inventor file. Export the model as STEP from Inventor to view it in 3D."
   text_cad_preview_solid_edge_image: "Preview image saved in the Solid Edge file. Export the model as STEP from Solid Edge to view it in 3D."
+  text_cad_preview_solidworks_image: "Preview image saved in the SolidWorks file. Export the model as STEP from SolidWorks to view it in 3D."
   text_cad_preview_no_image: "The file contains no preview image."
   text_cad_preview_solids: "The drawing contains 3D solids, which cannot be displayed in the preview."

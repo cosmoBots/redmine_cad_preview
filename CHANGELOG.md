@@ -4,6 +4,7 @@
 * feat: 3D preview of FreeCAD documents (.FCStd)
 * feat: 3D preview of PLY, Collada (.dae), FBX, VRML (.wrl), AMF and 3DS files
 * feat: preview image of Solid Edge files (.par, .asm, .psm, .pwd, .dft)
+* feat: preview image of SolidWorks files (.sldprt, .sldasm, .slddrw)
 * feat: thumbnails of CAD attachments, from the image saved in the file (Inventor, Solid Edge, 3MF, DXF, DWG) or a snapshot of the viewer
 * feat: file icons for 3D models and 2D drawings in the attachment lists (Redmine 7.0 and later)
 * feat: notice for 3D solids in DXF and DWG drawings, which cannot be displayed

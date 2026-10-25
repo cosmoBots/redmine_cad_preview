@@ -25,5 +25,6 @@ sv:
   label_cad_preview_units: "enheter"
   text_cad_preview_inventor_image: "Förhandsgranskningsbild som sparats i Inventor-filen. Exportera modellen som STEP från Inventor för att visa den i 3D."
   text_cad_preview_solid_edge_image: "Förhandsgranskningsbild som sparats i Solid Edge-filen. Exportera modellen som STEP från Solid Edge för att visa den i 3D."
+  text_cad_preview_solidworks_image: "Förhandsgranskningsbild som sparats i SolidWorks-filen. Exportera modellen som STEP från SolidWorks för att visa den i 3D."
   text_cad_preview_no_image: "Filen innehåller ingen förhandsgranskningsbild."
   text_cad_preview_solids: "Ritningen innehåller 3D-solider som inte kan visas i förhandsgranskningen."

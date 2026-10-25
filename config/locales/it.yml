@@ -25,5 +25,6 @@ it:
   label_cad_preview_units: "unità"
   text_cad_preview_inventor_image: "Immagine di anteprima salvata nel file Inventor. Esporta il modello come STEP da Inventor per visualizzarlo in 3D."
   text_cad_preview_solid_edge_image: "Immagine di anteprima salvata nel file Solid Edge. Esporta il modello come STEP da Solid Edge per visualizzarlo in 3D."
+  text_cad_preview_solidworks_image: "Immagine di anteprima salvata nel file SolidWorks. Esporta il modello come STEP da SolidWorks per visualizzarlo in 3D."
   text_cad_preview_no_image: "Il file non contiene alcuna immagine di anteprima."
   text_cad_preview_solids: "Il disegno contiene solidi 3D che non possono essere visualizzati nell'anteprima."

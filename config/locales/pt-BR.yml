@@ -25,5 +25,6 @@ pt-BR:
   label_cad_preview_units: "unidades"
   text_cad_preview_inventor_image: "Imagem de pré-visualização salva no arquivo do Inventor. Exporte o modelo como STEP no Inventor para vê-lo em 3D."
   text_cad_preview_solid_edge_image: "Imagem de pré-visualização salva no arquivo do Solid Edge. Exporte o modelo como STEP no Solid Edge para vê-lo em 3D."
+  text_cad_preview_solidworks_image: "Imagem de pré-visualização salva no arquivo do SolidWorks. Exporte o modelo como STEP no SolidWorks para vê-lo em 3D."
   text_cad_preview_no_image: "O arquivo não contém imagem de pré-visualização."
   text_cad_preview_solids: "O desenho contém sólidos 3D que não podem ser exibidos na pré-visualização."

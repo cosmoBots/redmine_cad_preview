@@ -22,7 +22,8 @@ class CadPreviewsController < ApplicationController
     end
   end
 
-  # Sends the image saved in the file (Inventor, Solid Edge, 3MF, DXF, DWG)
+  # Sends the image saved in the file (Inventor, Solid Edge, SolidWorks, FreeCAD,
+  # 3MF, DXF, DWG)
   def image
     path = RedmineCadPreview::PreviewImage.extract(@attachment)
     return render_404 unless path

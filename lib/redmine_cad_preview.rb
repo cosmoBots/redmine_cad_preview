@@ -4,8 +4,8 @@ module RedmineCadPreview
   VERSION = '0.2.0'
 
   # Formats and file extensions. DWG files are converted to DXF on the server.
-  # Inventor and Solid Edge files are shown with the preview image saved in
-  # the file (IMAGE_FORMATS).
+  # Inventor, Solid Edge and SolidWorks files are shown with the preview image
+  # saved in the file (IMAGE_FORMATS).
   FORMATS = {
     'step' => %w[.step .stp],
     'iges' => %w[.iges .igs],
@@ -25,7 +25,8 @@ module RedmineCadPreview
     'dxf' => %w[.dxf],
     'dwg' => %w[.dwg],
     'inventor' => %w[.ipt .iam .ipn .idw .ide],
-    'solid_edge' => %w[.par .asm .psm .pwd .dft]
+    'solid_edge' => %w[.par .asm .psm .pwd .dft],
+    'solidworks' => %w[.sldprt .sldasm .slddrw]
   }.freeze
 
   # Formats read with OpenCASCADE (occt-import-js) in the browser
@@ -33,7 +34,7 @@ module RedmineCadPreview
 
   # Formats that cannot be displayed in the viewer, only with the image
   # saved in the file
-  IMAGE_FORMATS = %w[inventor solid_edge].freeze
+  IMAGE_FORMATS = %w[inventor solid_edge solidworks].freeze
 
   DEFAULT_SETTINGS = {
     'formats' => FORMATS.keys,

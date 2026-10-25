@@ -25,5 +25,6 @@ ru:
   label_cad_preview_units: "единиц"
   text_cad_preview_inventor_image: "Изображение предварительного просмотра, сохранённое в файле Inventor. Чтобы просмотреть модель в 3D, экспортируйте её из Inventor в формат STEP."
   text_cad_preview_solid_edge_image: "Изображение предварительного просмотра, сохранённое в файле Solid Edge. Чтобы просмотреть модель в 3D, экспортируйте её из Solid Edge в формат STEP."
+  text_cad_preview_solidworks_image: "Изображение предварительного просмотра, сохранённое в файле SolidWorks. Чтобы просмотреть модель в 3D, экспортируйте её из SolidWorks в формат STEP."
   text_cad_preview_no_image: "Файл не содержит изображения предварительного просмотра."
   text_cad_preview_solids: "Чертёж содержит 3D-тела, которые невозможно отобразить в предварительном просмотре."

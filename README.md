@@ -90,7 +90,7 @@ The conversion runs as an Active Job. With the default queue adapter of Redmine,
 cd $REDMINE_ROOT/plugins
 git clone https://github.com/flowalchs/redmine_cad_preview.git
 ```
-Restart your Redmine server to load the plugin. No database migration is needed.
+Restart your Redmine server to load the plugin. No database migration and no `bundle install` are needed, as the plugin has no Gemfile.
 
 ## 🧪 Tests
 
@@ -98,6 +98,8 @@ Restart your Redmine server to load the plugin. No database migration is needed.
 cd $REDMINE_ROOT
 bundle exec rake redmine:plugins:test NAME=redmine_cad_preview RAILS_ENV=test
 ```
+
+With `COVERAGE=1`, a coverage report is created in `coverage/` (with `simplecov` of Redmine). The Cobertura report for Codecov is created only if `simplecov-cobertura` is installed, e.g. with `gem 'simplecov-cobertura'` in Redmine's `Gemfile.local`.
 
 The tests use a stand-in for `dwg2dxf` (`test/support/fake_dwg2dxf`), so LibreDWG is not needed to run them. The test files with images are built with `test/support/build_fixtures.rb`.
 

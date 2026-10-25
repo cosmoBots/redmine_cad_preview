@@ -1,0 +1,61 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v*' # Trigger bei Tags wie v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Wichtig, um die Historie für die Release Notes zu haben
+
+      - name: Set version
+        id: version
+        run: |
+          REPOSITORY=${GITHUB_REPOSITORY#*/}
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "filename=$REPOSITORY-$VERSION" >> $GITHUB_ENV
+          echo "plugin=$REPOSITORY" >> $GITHUB_ENV
+
+      - name: Generate release notes
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"* %s" | grep "#" | sort -u)
+          else
+            COMMITS=$(git log ${PREVIOUS_TAG}..HEAD \
+              --pretty=format:"%s" \
+              | grep -E '#[0-9]+' \
+              | awk '
+                {
+                  match($0, /#[0-9]+/)
+                  issue=substr($0, RSTART, RLENGTH)
+                  if (!seen[issue]++) print "* " $0
+                }
+              ' \
+              | sort)
+          fi
+
+          # Nur für den Release-Text, die CHANGELOG.md wird nicht verändert
+          echo -e "## ${{ env.version }} ($DATE)\n$COMMITS" > release_notes.md
+
+      - name: Archive
+        run: |
+          cd ..; zip -r ${{ env.filename }}.zip ${{ env.plugin }}/ -x "*.git*" "*/docs/*" "*/test/*" "*/release_notes.md"
+          mv ${{ env.filename }}.zip ${{ env.plugin }}/
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release_notes.md # Nutzt die gefilterten Commits als Release-Text
+          draft: true
+          files: ${{ env.filename }}.zip

@@ -74,6 +74,35 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'a[data-cad-action=measure-angle]'
   end
 
+  def test_show_inventor_file
+    attachment = create_cad_attachment('part.ipt')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_response :success
+    assert_select '.cad-preview-image img[src=?]', "/cad_previews/#{attachment.id}/image"
+    assert_select 'p.cad-preview-hint', :text => /Export the model as STEP/
+    assert_select 'div.cad-preview', 0
+  end
+
+  def test_show_inventor_file_without_image
+    attachment = create_cad_attachment('notes.txt', :as => 'part.ipt')
+
+    get(:show, :params => {:id => attachment.id})
+    assert_response :success
+    assert_select 'p.cad-preview-message', :text => /no preview image/
+    assert_select '.cad-preview-image', 0
+  end
+
+  def test_thumbnail_of_inventor_file
+    skip 'ImageMagick is not available' unless Redmine::Thumbnail.convert_available?
+
+    attachment = create_cad_attachment('part.ipt')
+
+    get(:thumbnail, :params => {:id => attachment.id})
+    assert_response :success
+    assert_equal 'image/png', response.media_type
+  end
+
   def test_show_dwg_file_with_available_converter
     attachment = create_cad_attachment('drawing.dwg')
 

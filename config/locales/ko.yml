@@ -23,3 +23,5 @@ ko:
   label_cad_preview_angle: "각도"
   label_cad_preview_dimensions: "치수"
   label_cad_preview_units: "단위"
+  text_cad_preview_inventor_image: "Inventor 파일에 저장된 미리보기 이미지입니다. 3D로 보려면 Inventor에서 모델을 STEP으로 내보내세요."
+  text_cad_preview_no_image: "Inventor 파일에 미리보기 이미지가 없습니다."

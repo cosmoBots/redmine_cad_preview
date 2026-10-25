@@ -23,3 +23,5 @@ pl:
   label_cad_preview_angle: "Kąt"
   label_cad_preview_dimensions: "Wymiary"
   label_cad_preview_units: "jednostki"
+  text_cad_preview_inventor_image: "Obraz podglądu zapisany w pliku Inventor. Aby wyświetlić model w 3D, wyeksportuj go z programu Inventor do formatu STEP."
+  text_cad_preview_no_image: "Plik Inventor nie zawiera obrazu podglądu."

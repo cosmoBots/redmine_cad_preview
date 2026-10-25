@@ -38,11 +38,13 @@ module RedmineCadPreview
 
     # Creates an attachment. The DWG conversion after the upload is disabled
     # unless convert is true.
-    def create_cad_attachment(filename, container: Issue.find(1), convert: false)
+    # The attachment can be given another name than the fixture file with as.
+    def create_cad_attachment(filename, container: Issue.find(1), convert: false, as: filename)
       create = lambda do
         Attachment.create!(
           :container => container,
-          :file => Rack::Test::UploadedFile.new(File.join(FIXTURES_DIR, filename), 'application/octet-stream'),
+          :file => Rack::Test::UploadedFile.new(File.join(FIXTURES_DIR, filename), 'application/octet-stream',
+                                                :original_filename => as),
           :author => User.find(1)
         )
       end

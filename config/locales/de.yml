@@ -23,3 +23,5 @@ de:
   label_cad_preview_angle: "Winkel"
   label_cad_preview_dimensions: "Abmessungen"
   label_cad_preview_units: "Einheiten"
+  text_cad_preview_inventor_image: "Vorschaubild aus der Inventor-Datei. Für die 3D-Ansicht das Modell in Inventor als STEP exportieren."
+  text_cad_preview_no_image: "Die Inventor-Datei enthält kein Vorschaubild."

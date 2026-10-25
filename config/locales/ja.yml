@@ -23,3 +23,5 @@ ja:
   label_cad_preview_angle: "角度"
   label_cad_preview_dimensions: "寸法"
   label_cad_preview_units: "単位"
+  text_cad_preview_inventor_image: "Inventor ファイルに保存されたプレビュー画像です。3D で表示するには、Inventor でモデルを STEP 形式でエクスポートしてください。"
+  text_cad_preview_no_image: "この Inventor ファイルにはプレビュー画像が含まれていません。"

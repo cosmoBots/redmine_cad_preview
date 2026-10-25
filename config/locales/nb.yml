@@ -23,3 +23,5 @@ nb:
   label_cad_preview_angle: "Vinkel"
   label_cad_preview_dimensions: "Mål"
   label_cad_preview_units: "enheter"
+  text_cad_preview_inventor_image: "Forhåndsvisningsbilde lagret i Inventor-filen. Eksporter modellen som STEP fra Inventor for å vise den i 3D."
+  text_cad_preview_no_image: "Inventor-filen inneholder ikke noe forhåndsvisningsbilde."

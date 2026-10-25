@@ -18,6 +18,7 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 
 - **3D preview** – STEP (.step, .stp), IGES (.iges, .igs), BREP (.brep, .brp), STL, OBJ, 3MF, glTF (.gltf, .glb)
 - **2D preview** – DXF, and DWG converted to DXF
+- **Autodesk Inventor** (.ipt, .iam, .ipn, .idw, .ide) – Shows the preview image that Inventor saves in the file, also as thumbnail in the attachment list (with ImageMagick, like the thumbnails of Redmine)
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
 - **Measuring** – Overall dimensions of the model or drawing, distance between two points and angle between three points (without snapping). The unit is taken from the file where it is known (STEP, IGES, BREP: mm, glTF: m, DXF: `$INSUNITS`).
 - **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library.
@@ -65,7 +66,7 @@ The conversion runs as an Active Job. With the default queue adapter of Redmine,
 - **glTF**: `.gltf` files that reference external `.bin` or texture files are not supported. Use `.glb` instead.
 - **Large models**: STEP and IGES files are converted to triangles in the browser. Very large models can take a while and need a lot of memory.
 - **Measuring**: Points are picked on the surface of the model or anywhere in the drawing, without snapping to edges or end points. STL, OBJ and 3MF files have no unit, so measurements are shown in "units".
-- **Autodesk Inventor** (.ipt, .iam) is not supported. Export the model as STEP from Inventor to preview it.
+- **Autodesk Inventor**: Only the preview image saved in the file is shown, the model itself cannot be read without Inventor. Export the model as STEP from Inventor to view it in 3D. The image is the view of the last save in Inventor.
 
 ## 📋 Requirements
 

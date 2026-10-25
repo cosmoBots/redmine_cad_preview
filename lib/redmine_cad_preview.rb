@@ -4,6 +4,7 @@ module RedmineCadPreview
   VERSION = '0.1.0'
 
   # Formats and file extensions. DWG files are converted to DXF on the server.
+  # Inventor files are shown with the preview image saved in the file.
   FORMATS = {
     'step' => %w[.step .stp],
     'iges' => %w[.iges .igs],
@@ -14,7 +15,8 @@ module RedmineCadPreview
     'gltf' => %w[.gltf],
     'glb' => %w[.glb],
     'dxf' => %w[.dxf],
-    'dwg' => %w[.dwg]
+    'dwg' => %w[.dwg],
+    'inventor' => %w[.ipt .iam .ipn .idw .ide]
   }.freeze
 
   DEFAULT_SETTINGS = {

@@ -23,3 +23,5 @@ it:
   label_cad_preview_angle: "Angolo"
   label_cad_preview_dimensions: "Dimensioni"
   label_cad_preview_units: "unità"
+  text_cad_preview_inventor_image: "Immagine di anteprima salvata nel file Inventor. Esporta il modello come STEP da Inventor per visualizzarlo in 3D."
+  text_cad_preview_no_image: "Il file Inventor non contiene alcuna immagine di anteprima."

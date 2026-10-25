@@ -1,7 +1,16 @@
 <%= render :layout => 'layouts/file' do %>
   <% format = @cad_format == 'dwg' ? 'dxf' : @cad_format %>
   <% dwg_state = RedmineCadPreview::DwgConverter.state(@attachment) if @cad_format == 'dwg' %>
-  <% if dwg_state == :converting || dwg_state == :failed %>
+  <% if @cad_format == 'inventor' %>
+    <% if RedmineCadPreview::InventorThumbnail.png_for(@attachment) %>
+      <div class="cad-preview-image">
+        <%= image_tag cad_preview_image_path(@attachment), :alt => @attachment.filename %>
+      </div>
+      <p class="cad-preview-hint"><%= l(:text_cad_preview_inventor_image) %></p>
+    <% else %>
+      <p class="nodata cad-preview-message"><%= l(:text_cad_preview_no_image) %></p>
+    <% end %>
+  <% elsif dwg_state == :converting || dwg_state == :failed %>
     <p class="<%= dwg_state == :failed ? 'nodata' : 'warning' %> cad-preview-message">
       <%= l(dwg_state == :failed ? :text_cad_preview_conversion_failed : :text_cad_preview_converting) %>
     </p>

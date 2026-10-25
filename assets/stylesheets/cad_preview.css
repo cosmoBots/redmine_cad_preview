@@ -128,3 +128,16 @@ body.cad-preview-maximized-body {
 .cad-preview:fullscreen .cad-preview-exit-fullscreen {
   display: inline-flex;
 }
+
+/* Preview image of Inventor files */
+.cad-preview-image {
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  padding: 8px;
+  text-align: center;
+}
+
+.cad-preview-image img {
+  max-inline-size: 100%;
+  block-size: auto;
+}

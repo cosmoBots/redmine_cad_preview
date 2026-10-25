@@ -21,6 +21,17 @@ class CadPreviewsController < ApplicationController
     end
   end
 
+  # Sends the preview image saved in an Inventor file
+  def image
+    path = RedmineCadPreview::InventorThumbnail.png_for(@attachment)
+    return render_404 unless path
+
+    if stale?(:etag => @attachment.digest, :template => false)
+      send_file path, :filename => "#{File.basename(@attachment.filename, '.*')}.png",
+                      :type => 'image/png', :disposition => 'inline'
+    end
+  end
+
   private
 
   def find_attachment

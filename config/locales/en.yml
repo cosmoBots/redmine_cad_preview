@@ -23,3 +23,5 @@ en:
   label_cad_preview_angle: "Angle"
   label_cad_preview_dimensions: "Dimensions"
   label_cad_preview_units: "units"
+  text_cad_preview_inventor_image: "Preview image saved in the Inventor file. Export the model as STEP from Inventor to view it in 3D."
+  text_cad_preview_no_image: "The Inventor file contains no preview image."

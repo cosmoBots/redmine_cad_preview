@@ -33,6 +33,25 @@ class CadPreviewsControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_image
+    attachment = create_cad_attachment('part.ipt')
+    @request.session[:user_id] = 2
+
+    get(:image, :params => {:id => attachment.id})
+    assert_response :success
+    assert_equal 'image/png', response.media_type
+    assert_match(/\Ainline/, response.headers['Content-Disposition'])
+    assert_equal File.binread(File.join(FIXTURES_DIR, 'thumbnail.png')), response.body
+  end
+
+  def test_image_without_image
+    attachment = create_cad_attachment('notes.txt', :as => 'part.ipt')
+    @request.session[:user_id] = 2
+
+    get(:image, :params => {:id => attachment.id})
+    assert_response :not_found
+  end
+
   def test_file_should_require_permission
     attachment = create_cad_attachment('model.step', :container => Issue.find(4)) # private project
 

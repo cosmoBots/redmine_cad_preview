@@ -23,3 +23,5 @@ sv:
   label_cad_preview_angle: "Vinkel"
   label_cad_preview_dimensions: "Mått"
   label_cad_preview_units: "enheter"
+  text_cad_preview_inventor_image: "Förhandsgranskningsbild som sparats i Inventor-filen. Exportera modellen som STEP från Inventor för att visa den i 3D."
+  text_cad_preview_no_image: "Inventor-filen innehåller ingen förhandsgranskningsbild."

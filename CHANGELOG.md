@@ -1,10 +1,17 @@
 # Changelog
 
-## v0.2.0 (unreleased)
+## v0.3.0 (unreleased)
 * feat: 3D preview of FreeCAD documents (.FCStd)
 * feat: 3D preview of PLY, Collada (.dae), FBX, VRML (.wrl), AMF and 3DS files
-* feat: preview image of Solid Edge files (.par, .asm, .psm, .pwd, .dft)
 * feat: preview image of SolidWorks files (.sldprt, .sldasm, .slddrw)
+* fix: Cobertura coverage report for Codecov with Redmine 6.1 and 7.0
+* fix: tests with Redmine 6.0, 6.1 and 7.0
+* chore: Dependabot checks the libraries of the viewer monthly, and the viewer is rebuilt in its pull requests
+* docs: screenshots side by side in the README
+* docs: fflate in the third-party notices
+
+## v0.2.0 (unreleased)
+* feat: preview image of Solid Edge files (.par, .asm, .psm, .pwd, .dft)
 * feat: thumbnails of CAD attachments, from the image saved in the file (Inventor, Solid Edge, 3MF, DXF, DWG) or a snapshot of the viewer
 * feat: file icons for 3D models and 2D drawings in the attachment lists (Redmine 7.0 and later)
 * feat: notice for 3D solids in DXF and DWG drawings, which cannot be displayed

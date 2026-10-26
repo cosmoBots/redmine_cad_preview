@@ -1,8 +1,10 @@
 {
   "name": "redmine-cad-preview-frontend",
   "private": true,
+  "type": "module",
   "description": "Builds the CAD viewer of the redmine_cad_preview plugin",
   "scripts": {
+    "test": "node --test test/*.test.mjs",
     "build": "node build.mjs"
   },
   "dependencies": {

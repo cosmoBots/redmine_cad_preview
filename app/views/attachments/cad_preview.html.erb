@@ -16,10 +16,13 @@
     </p>
   <% else %>
     <% url = @cad_format == 'dwg' ? cad_preview_dxf_path(@attachment) : cad_preview_file_path(@attachment) %>
+    <% viewer_options = RedmineCadPreview::ViewerOptions.for(@attachment) %>
     <div class="cad-preview"
          data-cad-preview
          data-url="<%= url %>"
          data-format="<%= format %>"
+         data-material-mode="<%= viewer_options.fetch('material_mode') %>"
+         data-lighting="<%= viewer_options.fetch('lighting') %>"
          data-error="<%= l(:text_cad_preview_error) %>"
          data-filename="<%= @attachment.filename %>"
          <% if @cad_image && format == 'dxf' %>
@@ -42,6 +45,12 @@
         <% icon = ->(name, label) { sprite_icon(name, label, :plugin => 'redmine_cad_preview') } %>
         <%= link_to icon.('zoom-scan', l(:button_cad_preview_fit)), '#', :class => 'icon', :data => {:cad_action => 'fit'} %>
         <% unless format == 'dxf' %>
+          <label><%= l(:label_cad_preview_material_mode) %>
+            <%= select_tag 'cad_material_mode', options_for_select([[l(:label_cad_preview_original), 'original'], [l(:label_cad_preview_matte), 'matte']], viewer_options.fetch('material_mode')), data: { cad_material_mode: true }, id: nil %>
+          </label>
+          <label><%= l(:label_cad_preview_lighting) %>
+            <%= select_tag 'cad_lighting', options_for_select([[l(:label_cad_preview_studio), 'studio'], [l(:label_cad_preview_original), 'original']], viewer_options.fetch('lighting')), data: { cad_lighting: true }, id: nil %>
+          </label>
           <%= link_to icon.('box', l(:button_cad_preview_wireframe)), '#', :class => 'icon', :data => {:cad_action => 'wireframe'} %>
         <% end %>
         <%= link_to icon.('ruler-measure', l(:button_cad_preview_measure_distance)), '#', :class => 'icon', :data => {:cad_action => 'measure-distance'} %>

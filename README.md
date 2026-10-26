@@ -1,5 +1,26 @@
 # Redmine CAD Preview Plugin
 
+## cosmoBots fork: studio lighting and material controls
+
+Development revision `1.0.1-cosmobots.1` adds procedural studio environment
+lighting (PMREM/RoomEnvironment, no external HDR downloads), essential for
+fully metallic glTF materials. Each 3D viewer offers Original/Matte material
+and Original/Studio lighting selectors. Matte clones preserve model colors,
+textures and transparency; switching back restores the original materials.
+Uploaded model files are never rewritten.
+
+Integrations can register initial defaults with
+`RedmineCadPreview::ViewerOptions.register(:integration) { |attachment| ... }`.
+Supported keys are `material_mode` (`original`/`matte`) and `lighting`
+(`studio`/`original`); values are allow-listed. The optional
+`cosmosys_cad_preview` plugin supplies cosmoSys defaults via this API, without
+duplicating viewer code. `cd frontend && npm ci && npm test && npm run build`
+rebuilds the bundled asset. No new npm dependencies or database migrations.
+
+Upstream: https://github.com/flowalchs/redmine_cad_preview. The original MIT
+license and author attribution remain intact. Saved views, wiki macros and
+static report figures are not implemented by this first change.
+
 [![build](https://github.com/flowalchs/redmine_cad_preview/actions/workflows/build.yml/badge.svg)](https://github.com/flowalchs/redmine_cad_preview/actions/workflows/build.yml)
 [![Last release](https://img.shields.io/github/v/release/flowalchs/redmine_cad_preview?label=latest%20release&logo=github&style=flat-square)](https://github.com/flowalchs/redmine_cad_preview/releases/latest)
 [![Rate at redmine.org](http://img.shields.io/badge/rate%20at-redmine.org-blue.svg?style=flat-square)](https://www.redmine.org/plugins/redmine_cad_preview)

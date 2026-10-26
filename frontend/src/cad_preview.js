@@ -17,6 +17,7 @@
 //                     drawings of 3D solids
 
 import * as THREE from 'three';
+import { ModelAppearance, StudioLighting } from './model_appearance.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -356,6 +357,8 @@ class ModelViewer {
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 2.5));
     this.camera.add(new THREE.DirectionalLight(0xffffff, 1.5));
     this.scene.add(this.camera);
+    this.studioLighting = new StudioLighting(this.renderer, this.scene);
+    this.studioLighting.apply(element.dataset.lighting || 'studio');
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
@@ -373,6 +376,8 @@ class ModelViewer {
   async load() {
     const buffer = await fetchFile(this.element.dataset.url);
     this.object = prepareObject(await this.parse(buffer));
+    this.appearance = new ModelAppearance(this.object);
+    this.setMaterialMode(this.element.dataset.materialMode || 'original');
     this.scene.add(this.object);
     this.fit();
     this.renderer.setAnimationLoop(() => {
@@ -436,6 +441,17 @@ class ModelViewer {
         return occtResultToObject(result);
       }
     }
+  }
+
+  setMaterialMode(mode) {
+    this.appearance?.apply(mode);
+    this.object?.traverse((mesh) => {
+      if (mesh.isMesh) for (const material of [].concat(mesh.material)) material.wireframe = this.wireframe;
+    });
+  }
+
+  setLighting(mode) {
+    this.studioLighting.apply(mode);
   }
 
   // Size of the model along the x, y and z axes
@@ -783,6 +799,12 @@ async function initialize(element) {
       event.preventDefault();
       actions[button.dataset.cadAction]?.();
     });
+  });
+  element.querySelector('[data-cad-material-mode]')?.addEventListener('change', (event) => {
+    viewer.setMaterialMode(event.target.value);
+  });
+  element.querySelector('[data-cad-lighting]')?.addEventListener('change', (event) => {
+    viewer.setLighting(event.target.value);
   });
 
   document.addEventListener('keydown', (event) => {

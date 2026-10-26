@@ -28,3 +28,8 @@ es:
   text_cad_preview_solidworks_image: "Imagen de vista previa guardada en el archivo de SolidWorks. Exporte el modelo como STEP desde SolidWorks para verlo en 3D."
   text_cad_preview_no_image: "El archivo no contiene ninguna imagen de vista previa."
   text_cad_preview_solids: "El dibujo contiene sólidos 3D que no se pueden mostrar en la vista previa."
+  label_cad_preview_material_mode: "Material"
+  label_cad_preview_lighting: "Iluminación"
+  label_cad_preview_original: "Original"
+  label_cad_preview_matte: "Mate"
+  label_cad_preview_studio: "Estudio"

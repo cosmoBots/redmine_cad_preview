@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RedmineCadPreview
-  VERSION = '1.0.0'
+  VERSION = '1.0.1-cosmobots.1'
 
   # Formats and file extensions. DWG files are converted to DXF on the server.
   # Inventor, Solid Edge and SolidWorks files are shown with the preview image
@@ -37,6 +37,8 @@ module RedmineCadPreview
   IMAGE_FORMATS = %w[inventor solid_edge solidworks].freeze
 
   DEFAULT_SETTINGS = {
+    'material_mode' => 'original',
+    'lighting' => 'studio',
     'formats' => FORMATS.keys,
     'max_file_size' => '50',
     'dwg2dxf_command' => 'dwg2dxf',

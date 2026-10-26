@@ -1,4 +1,9 @@
 en:
+  label_cad_preview_material_mode: "Material"
+  label_cad_preview_lighting: "Lighting"
+  label_cad_preview_original: "Original"
+  label_cad_preview_matte: "Matte"
+  label_cad_preview_studio: "Studio"
   button_cad_preview_fit: "Fit to view"
   button_cad_preview_wireframe: "Wireframe"
   text_cad_preview_hint_3d: "Drag to rotate, scroll to zoom, right-click and drag to pan."

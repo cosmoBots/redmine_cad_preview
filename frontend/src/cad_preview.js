@@ -18,6 +18,7 @@
 
 import * as THREE from 'three';
 import { ModelAppearance, StudioLighting } from './model_appearance.js';
+import { readView, applyView } from './view_state.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -350,7 +351,7 @@ class ModelViewer {
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
     if (Z_UP_FORMATS.includes(this.format)) this.camera.up.set(0, 0, 1);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.canvasContainer.appendChild(this.renderer.domElement);
 
@@ -444,6 +445,7 @@ class ModelViewer {
   }
 
   setMaterialMode(mode) {
+    this.element.dataset.materialMode = mode;
     this.appearance?.apply(mode);
     this.object?.traverse((mesh) => {
       if (mesh.isMesh) for (const material of [].concat(mesh.material)) material.wireframe = this.wireframe;
@@ -451,7 +453,34 @@ class ModelViewer {
   }
 
   setLighting(mode) {
+    this.element.dataset.lighting = mode;
     this.studioLighting.apply(mode);
+  }
+
+  setProjection(mode, frustumHeight) {
+    const old = this.camera;
+    const aspect = this.canvas.width / this.canvas.height;
+    const height = frustumHeight || 2 * old.position.distanceTo(this.controls.target) * Math.tan(Math.PI / 8);
+    const camera = mode === 'orthographic'
+      ? new THREE.OrthographicCamera(-height * aspect / 2, height * aspect / 2, height / 2, -height / 2, old.near, old.far)
+      : new THREE.PerspectiveCamera(45, aspect, old.near, old.far);
+    camera.position.copy(old.position);
+    camera.up.copy(old.up);
+    while (old.children.length) camera.add(old.children[0]);
+    this.scene.remove(old);
+    this.scene.add(camera);
+    this.camera = camera;
+    this.controls.object = camera;
+    this.controls.update();
+    this.resize();
+  }
+
+  exportView() { return readView(this); }
+  restoreView(state) { applyView(this, state); }
+
+  getRenderContext() {
+    return { canvas: this.canvas, renderer: this.renderer, scene: this.scene,
+             render: () => this.render() };
   }
 
   // Size of the model along the x, y and z axes
@@ -491,11 +520,18 @@ class ModelViewer {
     if (box.isEmpty()) return;
     const center = box.getCenter(new THREE.Vector3());
     const radius = box.getSize(new THREE.Vector3()).length() / 2 || 1;
-    const distance = radius / Math.sin(THREE.MathUtils.degToRad(this.camera.fov / 2));
+    const distance = radius / Math.sin(THREE.MathUtils.degToRad((this.camera.fov || 45) / 2));
     const direction = this.camera.up.z === 1 ? new THREE.Vector3(1, -1, 0.8) : new THREE.Vector3(1, 0.8, 1);
 
     this.camera.near = distance / 100;
     this.camera.far = distance * 100;
+    this.camera.zoom = 1;
+    if (this.camera.isOrthographicCamera) {
+      const halfHeight = radius / Math.min(1, this.canvas.width / this.canvas.height);
+      this.camera.top = halfHeight;
+      this.camera.bottom = -halfHeight;
+      this.resize();
+    }
     this.camera.position.copy(center).add(direction.normalize().multiplyScalar(distance));
     this.camera.updateProjectionMatrix();
     this.controls.target.copy(center);
@@ -514,7 +550,13 @@ class ModelViewer {
     const width = this.canvasContainer.clientWidth;
     const height = this.canvasContainer.clientHeight;
     if (width === 0 || height === 0) return;
-    this.camera.aspect = width / height;
+    if (this.camera.isOrthographicCamera) {
+      const halfHeight = (this.camera.top - this.camera.bottom) / 2;
+      this.camera.left = -halfHeight * width / height;
+      this.camera.right = halfHeight * width / height;
+    } else {
+      this.camera.aspect = width / height;
+    }
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
   }
@@ -525,6 +567,7 @@ class DrawingViewer {
     this.element = element;
     this.viewer = new DxfViewer(element.querySelector('.cad-preview-canvas'), {
       clearColor: new THREE.Color(0xffffff),
+      canvasAlpha: true,
       autoResize: true,
       colorCorrection: true,
       retainParsedDxf: true
@@ -581,6 +624,26 @@ class DrawingViewer {
   }
 
   toggleWireframe() {}
+
+  exportView() {
+    const camera = this.viewer.GetCamera();
+    return { version: 1, projection: 'drawing', center: [camera.position.x, camera.position.y],
+             view_width: (camera.right - camera.left) / camera.zoom,
+             aspect: this.canvas.width / this.canvas.height };
+  }
+
+  restoreView(state) {
+    if (state.version !== 1 || state.projection !== 'drawing') throw new Error('Unsupported drawing view');
+    const container = this.element.querySelector('.cad-preview-canvas');
+    this.viewer.SetSize(container.clientWidth, container.clientHeight);
+    this.viewer.SetView({ x: state.center[0], y: state.center[1] }, state.view_width);
+    this.render();
+  }
+
+  getRenderContext() {
+    return { canvas: this.canvas, renderer: this.viewer.GetRenderer(), scene: null,
+             render: () => this.render() };
+  }
 }
 
 // Draws the current view with the measurement and a caption (file name,
@@ -821,11 +884,15 @@ async function initialize(element) {
     showDimensions(element, viewer, i18n);
     showSolidsNotice(element, viewer, i18n);
     status.hidden = true;
+    element.cadViewer = viewer;
+    element.dispatchEvent(new CustomEvent('cad-preview:ready', { bubbles: true, detail: { viewer } }));
     if (element.dataset.snapshotUrl && !viewer.mostlySolids) {
       sendSnapshot(element, viewer).catch((error) => console.error('CAD preview snapshot:', error));
     }
   } catch (error) {
     console.error('CAD preview:', error);
+    element.cadError = error;
+    element.dispatchEvent(new CustomEvent('cad-preview:error', { bubbles: true }));
     status.textContent = element.dataset.error;
     status.classList.add('cad-preview-error');
   }

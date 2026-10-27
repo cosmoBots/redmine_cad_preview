@@ -13,13 +13,33 @@ Integrations can register initial defaults with
 `RedmineCadPreview::ViewerOptions.register(:integration) { |attachment| ... }`.
 Supported keys are `material_mode` (`original`/`matte`) and `lighting`
 (`studio`/`original`); values are allow-listed. The optional
-`cosmosys_cad_preview` plugin supplies cosmoSys defaults via this API, without
-duplicating viewer code. `cd frontend && npm ci && npm test && npm run build`
+integration plugin can supply defaults via this API without duplicating
+viewer code. `cd frontend && npm ci && npm test && npm run build`
 rebuilds the bundled asset. No new npm dependencies or database migrations.
 
 Upstream: https://github.com/flowalchs/redmine_cad_preview. The original MIT
-license and author attribution remain intact. Saved views, wiki macros and
-static report figures are not implemented by this first change.
+license and author attribution remain intact.
+
+### Generic camera and rendering extension API
+
+After loading, a viewer element exposes `element.cadViewer` and dispatches the
+bubbling `cad-preview:ready` event with `detail.viewer`. For 3D models the API
+offers `exportView()`, `restoreView(state)`, `setProjection('perspective' |
+'orthographic')` and `getRenderContext()`. The latter exposes the canvas,
+renderer, scene (null for drawings) and a `render()` callback for integrations.
+It does not change the background or generate an editorial image.
+State schema version 1 includes camera
+position/target/up, projection/zoom/frustum, clipping planes, aspect, material,
+lighting, wireframe and background. `restoreView` restores the camera and
+appearance; the embedding integration must preserve the saved viewport aspect.
+Failed model loads set `element.cadError` and dispatch `cad-preview:error`,
+so integrations can keep their controls visible with a meaningful error.
+Editorial image capture, cropping, sizing, storage, authorization and report
+selection belong to the integration, not this fork. The DXF viewer also
+supports `exportView`, `restoreView` and `getRenderContext`: schema version 1 with
+`projection: 'drawing'`, scene `center`, `view_width` and viewport `aspect`.
+Regression tests run without WebGL
+for state handling, supplemented in csys by a real Chrome/WebGL smoke.
 
 [![build](https://github.com/flowalchs/redmine_cad_preview/actions/workflows/build.yml/badge.svg)](https://github.com/flowalchs/redmine_cad_preview/actions/workflows/build.yml)
 [![Last release](https://img.shields.io/github/v/release/flowalchs/redmine_cad_preview?label=latest%20release&logo=github&style=flat-square)](https://github.com/flowalchs/redmine_cad_preview/releases/latest)

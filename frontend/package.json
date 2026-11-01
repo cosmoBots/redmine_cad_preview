@@ -14,7 +14,7 @@
     "three": "0.186.1"
   },
   "devDependencies": {
-    "@tabler/icons": "3.49.0",
+    "@tabler/icons": "3.50.0",
     "esbuild": "0.28.2"
   }
 }

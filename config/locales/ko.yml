@@ -56,5 +56,5 @@ ko:
   text_cad_preview_view_not_found: "뷰 \"%{name}\"이(가) 없습니다."
   text_cad_preview_no_views: "첨부 파일에 저장된 뷰가 없습니다."
   text_cad_preview_macro_height: "높이는 %{min}에서 %{max}픽셀 사이여야 합니다."
-  text_cad_preview_macro_usage: "사용법: {{cad_preview(파일 이름 또는 첨부 파일 ID, view=이름, height=520, png)}}"
+  text_cad_preview_macro_usage: "사용법: {{cad_preview(파일 이름 또는 첨부 파일 ID, view=이름, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "변경된 뷰"

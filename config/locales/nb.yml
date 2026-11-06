@@ -56,5 +56,5 @@ nb:
   text_cad_preview_view_not_found: "Visningen \"%{name}\" finnes ikke."
   text_cad_preview_no_views: "Vedlegget har ingen lagrede visninger."
   text_cad_preview_macro_height: "Høyden må være mellom %{min} og %{max} piksler."
-  text_cad_preview_macro_usage: "Bruk: {{cad_preview(filnavn eller vedleggs-ID, view=navn, height=520, png)}}"
+  text_cad_preview_macro_usage: "Bruk: {{cad_preview(filnavn eller vedleggs-ID, view=navn, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "Endret visning"

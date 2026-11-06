@@ -56,5 +56,5 @@ en:
   text_cad_preview_view_not_found: "The view \"%{name}\" does not exist."
   text_cad_preview_no_views: "The attachment has no saved views."
   text_cad_preview_macro_height: "The height must be between %{min} and %{max} pixels."
-  text_cad_preview_macro_usage: "Usage: {{cad_preview(file name or attachment ID, view=name, height=520, png)}}"
+  text_cad_preview_macro_usage: "Usage: {{cad_preview(file name or attachment ID, view=name, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "Changed view"

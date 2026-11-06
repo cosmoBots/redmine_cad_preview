@@ -56,5 +56,5 @@ fr:
   text_cad_preview_view_not_found: "La vue \"%{name}\" n'existe pas."
   text_cad_preview_no_views: "Le fichier n'a pas de vues enregistrées."
   text_cad_preview_macro_height: "La hauteur doit être comprise entre %{min} et %{max} pixels."
-  text_cad_preview_macro_usage: "Utilisation : {{cad_preview(nom de fichier ou ID du fichier, view=nom, height=520, png)}}"
+  text_cad_preview_macro_usage: "Utilisation : {{cad_preview(nom de fichier ou ID du fichier, view=nom, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "Vue modifiée"

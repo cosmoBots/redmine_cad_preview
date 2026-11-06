@@ -69,6 +69,17 @@ class CadPreviewMacroTest < Redmine::IntegrationTest
     assert_select '.wiki img.cad-preview-placeholder', 0
   end
 
+  def test_macro_with_readonly_should_not_show_the_controls_to_save_views
+    Role.find(1).add_permission!(:save_cad_preview_views)
+    save_view('front')
+    show_issue_with('{{cad_preview(model.step, view=front)}} {{cad_preview(model.step, view=front, readonly)}}')
+
+    assert_select '.wiki div.cad-preview[data-view=front]', 2
+    assert_select '.wiki a[data-cad-action=save-view]', 1
+    assert_select '.wiki form.cad-preview-view-form', 1
+    assert_select '.wiki select[data-cad-view]', 2
+  end
+
   def test_macro_with_png
     view = save_view('front')
     show_issue_with('{{cad_preview(model.step, view=front, png, height=300)}}')

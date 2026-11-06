@@ -1,4 +1,4 @@
-// Suggests the arguments of the macro {{cad_preview(file, view=name, height=520, png)}}
+// Suggests the arguments of the macro {{cad_preview(file, view=name, height=520, png, readonly)}}
 // in the text fields of Redmine: the CAD attachments of the issue, wiki page or
 // other object of the page and the CAD files uploaded in the form, then the
 // options, the saved views of the file and heights. Enter closes the macro,
@@ -13,7 +13,7 @@
 // The macro and its arguments typed so far, before the caret
 const MACRO = /\{\{cad_preview\(([^()\n]*)$/;
 const MAX_SUGGESTIONS = 10;
-export const OPTIONS = ['view=', 'height=', 'png'];
+export const OPTIONS = ['view=', 'height=', 'png', 'readonly'];
 export const HEIGHTS = ['240', '360', '520', '800'];
 
 // Returns what is typed at the caret in the macro, or null outside of it:

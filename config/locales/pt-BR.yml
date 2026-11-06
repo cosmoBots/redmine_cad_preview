@@ -56,5 +56,5 @@ pt-BR:
   text_cad_preview_view_not_found: "A vista \"%{name}\" não existe."
   text_cad_preview_no_views: "O anexo não tem vistas salvas."
   text_cad_preview_macro_height: "A altura deve estar entre %{min} e %{max} pixels."
-  text_cad_preview_macro_usage: "Uso: {{cad_preview(nome do arquivo ou ID do anexo, view=nome, height=520, png)}}"
+  text_cad_preview_macro_usage: "Uso: {{cad_preview(nome do arquivo ou ID do anexo, view=nome, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "Vista alterada"

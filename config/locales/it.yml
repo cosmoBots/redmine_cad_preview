@@ -56,5 +56,5 @@ it:
   text_cad_preview_view_not_found: "La vista \"%{name}\" non esiste."
   text_cad_preview_no_views: "L'allegato non ha viste salvate."
   text_cad_preview_macro_height: "L'altezza deve essere compresa tra %{min} e %{max} pixel."
-  text_cad_preview_macro_usage: "Uso: {{cad_preview(nome del file o ID dell'allegato, view=nome, height=520, png)}}"
+  text_cad_preview_macro_usage: "Uso: {{cad_preview(nome del file o ID dell'allegato, view=nome, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "Vista modificata"

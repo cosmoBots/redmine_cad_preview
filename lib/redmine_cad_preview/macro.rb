@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 module RedmineCadPreview
-  # The macro {{cad_preview(attachment, view=name, height=520, png)}}, which
-  # shows the viewer of an attachment in wiki pages, issues and other texts.
+  # The macro {{cad_preview(attachment, view=name, height=520, png, readonly)}},
+  # which shows the viewer of an attachment in wiki pages, issues and other texts.
   #
   # The attachment is given by its file name, among the attachments of the
   # object of the text, or by its ID. Without view, the default view is
   # restored. view=* shows all saved views. With png, and where no viewer can
-  # be shown (PDF export, emails), the images of the views are shown.
+  # be shown (PDF export, emails), the images of the views are shown. With
+  # readonly, the viewer has no controls to save, delete or set views.
   module Macro
     DEFAULT_HEIGHT = 520
     # Heights of the viewer, and maximum heights of the images
@@ -26,7 +27,8 @@ module RedmineCadPreview
                "{{cad_preview(model.step)}} -- attachment of this page or issue, with its default view\n" \
                "{{cad_preview(123, view=front, height=420)}} -- attachment 123 with the view front, 420 pixels high\n" \
                "{{cad_preview(model.step, view=*)}} -- all saved views\n" \
-               "{{cad_preview(model.step, view=front, png)}} -- the image of the view instead of the viewer"
+               "{{cad_preview(model.step, view=front, png)}} -- the image of the view instead of the viewer\n" \
+               "{{cad_preview(model.step, view=front, readonly)}} -- the viewer without the controls to save views"
           macro :cad_preview do |obj, args|
             uploaded = @attachments if controller_path == 'previews' || action_name == 'preview'
             RedmineCadPreview::Macro.render(self, obj, args, :attachments => uploaded.to_a,
@@ -41,6 +43,9 @@ module RedmineCadPreview
       def render(view, obj, args, attachments: [], static: false)
         args = args.map {|arg| arg.to_s.strip}
         png = args.reject! {|arg| arg.casecmp?('png')}.present?
+        # The viewer without the controls to save, delete and set views, e.g. for
+        # a temporary state that must not replace a prepared view
+        readonly = args.reject! {|arg| arg.casecmp?('readonly')}.present?
         args, options = view.send(:extract_macro_options, args, :view, :height)
         raise ::I18n.t(:text_cad_preview_macro_usage) unless args.size == 1
 
@@ -55,7 +60,7 @@ module RedmineCadPreview
         else
           # Without view, the viewer restores the current default view
           names = options[:view] ? views.map(&:name) : [nil]
-          render_viewers(view, attachment, names, height(options[:height] || DEFAULT_HEIGHT, HEIGHTS))
+          render_viewers(view, attachment, names, height(options[:height] || DEFAULT_HEIGHT, HEIGHTS), readonly)
         end
       end
 
@@ -99,13 +104,14 @@ module RedmineCadPreview
         height.to_i
       end
 
-      def render_viewers(view, attachment, names, height)
+      def render_viewers(view, attachment, names, height, readonly)
         format = RedmineCadPreview.format_of(attachment.filename)
         viewers = names.map do |name|
           view.render(:partial => 'cad_previews/viewer',
                       :locals => {:attachment => attachment, :cad_format => format,
                                   :cad_image => PreviewImage.extract(attachment), :snapshot => false,
-                                  :view => name, :embedded => true, :height => height})
+                                  :view => name, :embedded => true, :height => height,
+                                  :readonly => readonly})
         end
         view.safe_join([assets(view), *viewers])
       end

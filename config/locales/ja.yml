@@ -56,5 +56,5 @@ ja:
   text_cad_preview_view_not_found: "ビュー「%{name}」は存在しません。"
   text_cad_preview_no_views: "添付ファイルに保存されたビューがありません。"
   text_cad_preview_macro_height: "高さは%{min}から%{max}ピクセルの間である必要があります。"
-  text_cad_preview_macro_usage: "使い方: {{cad_preview(ファイル名または添付ファイルID, view=名前, height=520, png)}}"
+  text_cad_preview_macro_usage: "使い方: {{cad_preview(ファイル名または添付ファイルID, view=名前, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "変更されたビュー"

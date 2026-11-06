@@ -56,5 +56,5 @@ pl:
   text_cad_preview_view_not_found: "Widok \"%{name}\" nie istnieje."
   text_cad_preview_no_views: "Załącznik nie ma zapisanych widoków."
   text_cad_preview_macro_height: "Wysokość musi wynosić od %{min} do %{max} pikseli."
-  text_cad_preview_macro_usage: "Użycie: {{cad_preview(nazwa pliku lub ID załącznika, view=nazwa, height=520, png)}}"
+  text_cad_preview_macro_usage: "Użycie: {{cad_preview(nazwa pliku lub ID załącznika, view=nazwa, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "Zmieniony widok"

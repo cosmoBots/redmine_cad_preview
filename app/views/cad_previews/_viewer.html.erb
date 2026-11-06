@@ -3,7 +3,8 @@
             snapshot (true to send a snapshot for the thumbnail),
             view (name of the view restored when the viewer is loaded, or nil for the default view),
             embedded (true in the macro: compact toolbar, started when visible),
-            height (height of the canvas in pixels, or nil) %>
+            height (height of the canvas in pixels, or nil),
+            readonly (optional, true in the macro to hide the controls to save views) %>
 <% format = cad_format == 'dwg' ? 'dxf' : cad_format %>
 <% dwg_state = RedmineCadPreview::DwgConverter.state(attachment) if cad_format == 'dwg' %>
 <% if RedmineCadPreview::IMAGE_FORMATS.include?(cad_format) %>
@@ -22,7 +23,7 @@
 <% else %>
   <% url = cad_format == 'dwg' ? cad_preview_dxf_path(attachment) : cad_preview_file_path(attachment) %>
   <% viewer_options = RedmineCadPreview::ViewerOptions.for(attachment) %>
-  <% views_editable = CadPreviewView.editable?(attachment) %>
+  <% views_editable = !local_assigns[:readonly] && CadPreviewView.editable?(attachment) %>
   <%# The image of the view that is restored, shown until the viewer is ready %>
   <% placeholder = (view ? RedmineCadPreview::Views.find(attachment, view) : RedmineCadPreview::Views.default(attachment))&.image %>
   <%# In the macro, the buttons show only their icon, with the label as title %>

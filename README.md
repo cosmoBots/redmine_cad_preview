@@ -76,6 +76,7 @@ The macro `cad_preview` shows the viewer of a CAD attachment in wiki pages, issu
 {{cad_preview(123, view=front, height=420)}}
 {{cad_preview(model.step, view=*)}}
 {{cad_preview(model.step, view=front, png)}}
+{{cad_preview(model.step, view=front, readonly)}}
 ```
 
 | Parameter | Description |
@@ -85,6 +86,7 @@ The macro `cad_preview` shows the viewer of a CAD attachment in wiki pages, issu
 | `view=*` | All saved views of the attachment, one below the other |
 | `height=520` | Height of the viewer in pixels, from 240 to 1200 (default: 520). With `png`, the maximum height of the images, from 16 to 1200. |
 | `png` | The images of the views instead of the viewer, without JavaScript. Without default view, the thumbnail of the attachment is shown. |
+| `readonly` | The viewer without the controls to save, delete and set views, also for users with the permissions. The views can still be restored. For viewers that show a temporary state, which should not replace a prepared view. |
 
 The viewer in the macro has the same toolbar as the preview of the attachment, with icons only. The views can be restored and, with the permissions, saved and deleted. The viewers are loaded when they become visible, so that a page with many viewers does not load all files at once.
 

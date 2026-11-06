@@ -36,8 +36,8 @@ test('matching values, those starting with the query first', () => {
 
 test('suggestions for files, options, views and heights', () => {
   assert.deepEqual(suggestions(at('{{cad_preview(st'), FILES), ['model.step', 'part.step']);
-  assert.deepEqual(suggestions(at('{{cad_preview(model.step, '), FILES), ['view=', 'height=', 'png']);
-  assert.deepEqual(suggestions(at('{{cad_preview(model.step, view=front, '), FILES), ['height=', 'png']);
+  assert.deepEqual(suggestions(at('{{cad_preview(model.step, '), FILES), ['view=', 'height=', 'png', 'readonly']);
+  assert.deepEqual(suggestions(at('{{cad_preview(model.step, view=front, '), FILES), ['height=', 'png', 'readonly']);
   assert.deepEqual(suggestions(at('{{cad_preview(model.step, p'), FILES), ['png']);
   assert.deepEqual(suggestions(at('{{cad_preview(Model.STEP, view='), FILES), ['*', 'detail', 'front']);
   assert.deepEqual(suggestions(at('{{cad_preview(12, view=fr'), FILES), ['front']);

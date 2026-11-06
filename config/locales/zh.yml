@@ -56,5 +56,5 @@ zh:
   text_cad_preview_view_not_found: "视图“%{name}”不存在。"
   text_cad_preview_no_views: "该附件没有已保存的视图。"
   text_cad_preview_macro_height: "高度必须在 %{min} 到 %{max} 像素之间。"
-  text_cad_preview_macro_usage: "用法:{{cad_preview(文件名或附件 ID, view=名称, height=520, png)}}"
+  text_cad_preview_macro_usage: "用法:{{cad_preview(文件名或附件 ID, view=名称, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "已更改的视图"

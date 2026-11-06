@@ -56,5 +56,5 @@ de:
   text_cad_preview_view_not_found: "Die Ansicht \"%{name}\" existiert nicht."
   text_cad_preview_no_views: "Der Anhang hat keine gespeicherten Ansichten."
   text_cad_preview_macro_height: "Die Höhe muss zwischen %{min} und %{max} Pixeln liegen."
-  text_cad_preview_macro_usage: "Verwendung: {{cad_preview(Dateiname oder Anhang-ID, view=Name, height=520, png)}}"
+  text_cad_preview_macro_usage: "Verwendung: {{cad_preview(Dateiname oder Anhang-ID, view=Name, height=520, png, readonly)}}"
   label_cad_preview_view_changed: "Geänderte Ansicht"

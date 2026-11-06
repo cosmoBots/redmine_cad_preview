@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.2.1 (unreleased)
+## v1.2.1 (2026-11-06)
 * feat: saved views of CAD attachments: save the current view under a name and restore it from the toolbar, for 3D models and 2D drawings (#3)
 * feat: the default view is restored when the preview is opened, and its image is the thumbnail of the attachment (#3)
 * feat: each view is saved with an image without background, cropped to the model or drawing, which can be downloaded with the attachments API of Redmine (#3)

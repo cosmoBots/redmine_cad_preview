@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0 # Wichtig, um die Historie für die Release Notes zu haben
 
       - name: Set version
         id: version
@@ -24,29 +22,21 @@ jobs:
           echo "filename=$REPOSITORY-$VERSION" >> $GITHUB_ENV
           echo "plugin=$REPOSITORY" >> $GITHUB_ENV
 
+      # The release text is the section of the version in CHANGELOG.md, from
+      # "## v1.2.1 (date)" to the next "## ". The release fails without it.
       - name: Generate release notes
         run: |
-          DATE=$(date +%Y-%m-%d)
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          awk -v heading="## ${{ env.version }} " '
+            index($0, heading) == 1 { found = 1; print; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' > release_notes.md
 
-          if [ -z "$PREVIOUS_TAG" ]; then
-            COMMITS=$(git log --pretty=format:"* %s" | grep "#" | sort -u)
-          else
-            COMMITS=$(git log ${PREVIOUS_TAG}..HEAD \
-              --pretty=format:"%s" \
-              | grep -E '#[0-9]+' \
-              | awk '
-                {
-                  match($0, /#[0-9]+/)
-                  issue=substr($0, RSTART, RLENGTH)
-                  if (!seen[issue]++) print "* " $0
-                }
-              ' \
-              | sort)
+          if [ "$(grep -c '^\* ' release_notes.md)" -eq 0 ]; then
+            echo "::error file=CHANGELOG.md::No entries for ${{ env.version }} in CHANGELOG.md"
+            exit 1
           fi
-
-          # Nur für den Release-Text, die CHANGELOG.md wird nicht verändert
-          echo -e "## ${{ env.version }} ($DATE)\n$COMMITS" > release_notes.md
+          cat release_notes.md
 
       # Only the files needed to run the plugin. The sources of the JavaScript
       # (frontend/), the tests, the documentation images and the Gemfile (only
@@ -64,6 +54,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v3
         with:
-          body_path: release_notes.md # Nutzt die gefilterten Commits als Release-Text
+          body_path: release_notes.md
           draft: true
           files: ${{ env.filename }}.zip

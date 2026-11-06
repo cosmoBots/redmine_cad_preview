@@ -17,6 +17,7 @@ export class PartsPanel {
       viewer.fit();
     });
     viewer.partsChanged = () => this.refresh();
+    viewer.leftInset = () => this.coveredWidth();
     this.button.hidden = false;
     this.refresh();
   }
@@ -37,6 +38,15 @@ export class PartsPanel {
       this.items.push({ item, toggle, node });
       return item;
     });
+  }
+
+  // Width of the view covered by the panel. On narrow screens, the panel is
+  // over the top of the view and covers no width.
+  coveredWidth() {
+    if (this.panel.hidden) return 0;
+    const canvas = this.panel.parentElement.getBoundingClientRect();
+    const panel = this.panel.getBoundingClientRect();
+    return panel.width < canvas.width * 0.8 ? panel.right - canvas.left : 0;
   }
 
   toggle() {

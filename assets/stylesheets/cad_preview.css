@@ -24,6 +24,12 @@
   border-inline-start: 0;
 }
 
+/* Starts a new line of the toolbar */
+.cad-preview-toolbar-break {
+  flex-basis: 100%;
+  block-size: 0;
+}
+
 /* The downloads are aligned to the right, like the download of the file */
 .cad-preview-toolbar-group.cad-preview-downloads {
   margin-inline-start: auto;
@@ -116,6 +122,17 @@
   stroke: #fff;
   stroke-width: 3px;
   paint-order: stroke;
+}
+
+/* Controls of the section view in the toolbar */
+.cad-preview-section-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cad-preview-section-controls input[type=range] {
+  inline-size: 140px;
 }
 
 /* Parts of assemblies, over the left side of the view */

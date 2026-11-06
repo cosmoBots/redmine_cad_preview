@@ -30,6 +30,8 @@ import { SavedViews } from './saved_views.js';
 import { occtResultToObject } from './occt_object.js';
 import { hasParts, hiddenParts, isShown, setHiddenParts, showOnly, visibleBox } from './part_tree.js';
 import { PartsPanel } from './parts_panel.js';
+import { SectionView } from './section_view.js';
+import { SectionPanel } from './section_panel.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -356,7 +358,8 @@ class ModelViewer {
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
     if (Z_UP_FORMATS.includes(this.format)) this.camera.up.set(0, 0, 1);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    // The stencil buffer closes the cut faces of the section view
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, stencil: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.canvasContainer.appendChild(this.renderer.domElement);
 
@@ -385,6 +388,7 @@ class ModelViewer {
     // Parts of assemblies can be shown and hidden (STEP, IGES, BREP)
     this.parts = OCCT_FORMATS[this.format] && hasParts(this.object) ? this.object : null;
     this.appearance = new ModelAppearance(this.object);
+    this.section = new SectionView(this);
     this.setMaterialMode(this.element.dataset.materialMode || 'original');
     this.scene.add(this.object);
     this.fit();
@@ -475,6 +479,7 @@ class ModelViewer {
   setMaterialMode(mode) {
     this.element.dataset.materialMode = mode;
     this.appearance?.apply(mode);
+    if (this.section?.active) this.section.applyMaterials();
     this.object?.traverse((mesh) => {
       if (mesh.isMesh) for (const material of [].concat(mesh.material)) material.wireframe = this.wireframe;
     });
@@ -501,6 +506,7 @@ class ModelViewer {
     this.scene.add(camera);
     this.camera = camera;
     this.controls.object = camera;
+    if (this.sectionTransform) this.sectionTransform.camera = camera;
     this.controls.update();
     this.resize();
   }
@@ -524,6 +530,27 @@ class ModelViewer {
     object.visible = !object.visible;
     this.partsChanged?.();
     this.requestRender();
+  }
+
+  // Section view: {axis, position, flip} or null, see section_view.js
+  sectionState() {
+    return this.section?.active ? { ...this.section.state } : null;
+  }
+
+  setSection(state) {
+    if (!this.section) return;
+    this.section.set(state);
+    this.sectionChanged?.();
+    this.requestRender();
+  }
+
+  // Box of the parts that are shown
+  visibleBox() {
+    return this.parts ? visibleBox(this.object) : new THREE.Box3().setFromObject(this.object);
+  }
+
+  isShown(object) {
+    return isShown(object, this.object);
   }
 
   // Shows only the part and fits the camera to it
@@ -551,7 +578,8 @@ class ModelViewer {
     const pointer = new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1,
                                       -((clientY - rect.top) / rect.height) * 2 + 1);
     this.raycaster.setFromCamera(pointer, this.camera);
-    const hit = this.raycaster.intersectObject(this.object, true).find((h) => isShown(h.object, this.object));
+    const hit = this.raycaster.intersectObject(this.object, true)
+      .find((h) => isShown(h.object, this.object) && (!this.section || this.section.keeps(h.point)));
     return hit ? hit.point.clone() : null;
   }
 
@@ -566,34 +594,49 @@ class ModelViewer {
 
   // Renders the current view. The canvas can be copied until the next task.
   render() {
+    this.section?.beforeRender();
     this.renderer.render(this.scene, this.camera);
   }
 
   // Draws the current view without background on a 2D context
   drawTransparent(context) {
     const background = this.scene.background;
+    // The arrow of the section view is not part of the image
+    const helper = this.sectionTransform?.getHelper();
+    const helperVisible = helper?.visible;
+    if (helper) helper.visible = false;
     this.scene.background = null;
     this.render();
     context.drawImage(this.canvas, 0, 0);
     this.scene.background = background;
+    if (helper) helper.visible = helperVisible;
     this.render();
   }
 
   // Moves the camera so that the parts that are shown are visible
   fit() {
     if (!this.object) return;
-    const box = this.parts ? visibleBox(this.object) : new THREE.Box3().setFromObject(this.object);
+    const box = this.visibleBox();
     if (box.isEmpty()) return;
     const center = box.getCenter(new THREE.Vector3());
     const radius = box.getSize(new THREE.Vector3()).length() / 2 || 1;
-    const distance = radius / Math.sin(THREE.MathUtils.degToRad((this.camera.fov || 45) / 2));
+    // The panel of the parts covers the left side of the view: the model is
+    // fitted into the rest of the view
+    const width = this.canvas.clientWidth || 1;
+    const height = this.canvas.clientHeight || 1;
+    const inset = Math.min(this.leftInset?.() || 0, width / 2);
+    const halfFov = THREE.MathUtils.degToRad((this.camera.fov || 45) / 2);
+    const halfAngle = inset > 0
+      ? Math.min(halfFov, Math.atan(Math.tan(halfFov) * (width - inset) / height)) : halfFov;
+    const distance = radius / Math.sin(halfAngle);
     const direction = this.camera.up.z === 1 ? new THREE.Vector3(1, -1, 0.8) : new THREE.Vector3(1, 0.8, 1);
 
     this.camera.near = distance / 100;
     this.camera.far = distance * 100;
     this.camera.zoom = 1;
     if (this.camera.isOrthographicCamera) {
-      const halfHeight = radius / Math.min(1, this.canvas.width / this.canvas.height);
+      const aspect = inset > 0 ? (width - inset) / height : this.canvas.width / this.canvas.height;
+      const halfHeight = radius / Math.min(1, aspect);
       this.camera.top = halfHeight;
       this.camera.bottom = -halfHeight;
       this.resize();
@@ -601,6 +644,18 @@ class ModelViewer {
     this.camera.position.copy(center).add(direction.normalize().multiplyScalar(distance));
     this.camera.updateProjectionMatrix();
     this.controls.target.copy(center);
+    if (inset > 0) {
+      // Moves the model to the middle of the part of the view that is not
+      // covered, by moving the camera and the target to the left
+      const visibleHeight = this.camera.isOrthographicCamera
+        ? this.camera.top - this.camera.bottom : 2 * distance * Math.tan(halfFov);
+      this.camera.lookAt(center);
+      this.camera.updateMatrixWorld();
+      const shift = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0)
+        .multiplyScalar(-(inset / 2) * visibleHeight / height);
+      this.camera.position.add(shift);
+      this.controls.target.add(shift);
+    }
     this.controls.update();
   }
 
@@ -1009,6 +1064,11 @@ async function initialize(element) {
     if (viewer.parts) {
       const parts = new PartsPanel(element, viewer);
       actions.parts = () => parts.toggle();
+    }
+    if (viewer.section) {
+      const section = new SectionPanel(element, viewer);
+      actions.section = () => section.toggle();
+      actions['section-flip'] = () => section.flip();
     }
     status.hidden = true;
     if (element.dataset.viewsUrl) {

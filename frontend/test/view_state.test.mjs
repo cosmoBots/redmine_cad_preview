@@ -77,3 +77,20 @@ test('hidden parts are saved only if there are any and restored with the view', 
   applyView(viewer, { ...state, hidden: undefined });
   assert.deepEqual(hidden, []);
 });
+
+test('the section is saved only if the model is cut and restored with the view', () => {
+  const viewer = fixture();
+  let section = null;
+  viewer.sectionState = () => section;
+  viewer.setSection = (value) => { section = value; };
+  assert.equal('section' in readView(viewer), false);
+  section = { axis: 'y', position: 12.5, flip: true };
+  const state = readView(viewer);
+  assert.deepEqual(state.section, { axis: 'y', position: 12.5, flip: true });
+  section = null;
+  applyView(viewer, state);
+  assert.deepEqual(section, { axis: 'y', position: 12.5, flip: true });
+  applyView(viewer, { ...state, section: undefined });
+  assert.equal(section, null);
+});
+

@@ -106,9 +106,21 @@
           <%= button.('del', l(:button_cad_preview_delete_view), 'delete-view', :plugin => nil, :hidden => true) %>
         <% end %>
       </span>
-      <span class="cad-preview-toolbar-group">
+      <%# The tools for measuring and cutting start a new line %>
+      <span class="cad-preview-toolbar-break"></span>
+      <span class="cad-preview-toolbar-group cad-preview-tools">
         <%= button.('ruler-measure', l(:button_cad_preview_measure_distance), 'measure-distance') %>
         <%= button.('angle', l(:button_cad_preview_measure_angle), 'measure-angle') %>
+        <% unless format == 'dxf' %>
+          <%= button.('slice', l(:button_cad_preview_section), 'section') %>
+          <span class="cad-preview-section-controls" hidden>
+            <%= select_tag 'cad_section_axis', options_for_select(%w[x y z].map {|axis| [axis.upcase, axis]}),
+                           :id => nil, :title => l(:button_cad_preview_section), :data => {:cad_section_axis => true} %>
+            <input type="range" min="0" max="1000" step="1" value="500" title="<%= l(:label_cad_preview_section_position) %>"
+                   aria-label="<%= l(:label_cad_preview_section_position) %>" data-cad-section-position>
+            <%= button.('arrows-exchange', l(:button_cad_preview_flip_section), 'section-flip') %>
+          </span>
+        <% end %>
       </span>
       <span class="cad-preview-toolbar-group cad-preview-downloads">
         <% %w[png pdf].each do |type| %>

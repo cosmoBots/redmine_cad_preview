@@ -2,6 +2,7 @@
 export function readView(viewer) {
   const camera = viewer.camera;
   const hidden = viewer.hiddenParts?.() || [];
+  const section = viewer.sectionState?.() || null;
   return {
     version: 1, projection: camera.isOrthographicCamera ? 'orthographic' : 'perspective',
     position: camera.position.toArray(), target: viewer.controls.target.toArray(),
@@ -13,7 +14,9 @@ export function readView(viewer) {
     lighting: viewer.element.dataset.lighting || 'original',
     background: `#${viewer.scene.background.getHexString()}`, wireframe: viewer.wireframe,
     // Only if parts are hidden, so that the views saved before are unchanged
-    ...(hidden.length > 0 ? { hidden } : {})
+    ...(hidden.length > 0 ? { hidden } : {}),
+    // Only if the model is cut: {axis, position, flip}
+    ...(section ? { section } : {})
   };
 }
 
@@ -37,6 +40,7 @@ export function applyView(viewer, state) {
   viewer.setLighting(state.lighting);
   if (viewer.wireframe !== state.wireframe) viewer.toggleWireframe();
   viewer.setHiddenParts?.(state.hidden || []);
+  viewer.setSection?.(state.section || null);
   viewer.resize();
   viewer.controls.update();
   viewer.controls.enableDamping = damping;

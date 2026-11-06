@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.3.0 (unreleased)
+* feat: the colors of single faces of STEP models are shown, not only the color of the body #5
+
 ## v1.2.1 (2026-11-06)
 * feat: saved views of CAD attachments: save the current view under a name and restore it from the toolbar, for 3D models and 2D drawings (#3)
 * feat: the default view is restored when the preview is opened, and its image is the thumbnail of the attachment (#3)

@@ -27,6 +27,7 @@ import * as THREE from 'three';
 import { ModelAppearance, StudioLighting } from './model_appearance.js';
 import { readView, applyView } from './view_state.js';
 import { SavedViews } from './saved_views.js';
+import { occtResultToObject } from './occt_object.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -125,22 +126,8 @@ function defaultMaterial(color = DEFAULT_COLOR) {
   });
 }
 
-// Converts the result of occt-import-js into three.js meshes
-function occtResultToObject(result) {
-  const group = new THREE.Group();
-  for (const mesh of result.meshes) {
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(mesh.attributes.position.array, 3));
-    if (mesh.attributes.normal) {
-      geometry.setAttribute('normal', new THREE.Float32BufferAttribute(mesh.attributes.normal.array, 3));
-    }
-    geometry.setIndex(new THREE.Uint32BufferAttribute(Uint32Array.from(mesh.index.array), 1));
-    if (!mesh.attributes.normal) geometry.computeVertexNormals();
-
-    const color = mesh.color ? new THREE.Color(mesh.color[0], mesh.color[1], mesh.color[2]) : DEFAULT_COLOR;
-    group.add(new THREE.Mesh(geometry, defaultMaterial(color)));
-  }
-  return group;
+function occtToObject(result) {
+  return occtResultToObject(result, defaultMaterial, DEFAULT_COLOR);
 }
 
 function hasZeroNormals(geometry) {
@@ -206,13 +193,15 @@ function freecadToObject(buffer, occt) {
     const result = occt.ReadBrepFile(files[object.file], null);
     if (!result.success || result.meshes.length === 0) continue;
 
-    const part = occtResultToObject(result);
+    const part = occtToObject(result);
     if (object.color) {
       // RGBA packed into an unsigned integer
       const value = Number(object.color) >>> 0;
       const color = new THREE.Color().setRGB(((value >>> 24) & 255) / 255, ((value >>> 16) & 255) / 255,
                                              ((value >>> 8) & 255) / 255, THREE.SRGBColorSpace);
-      part.traverse((child) => { if (child.isMesh) child.material.color.copy(color); });
+      part.traverse((child) => {
+        if (child.isMesh) for (const material of [].concat(child.material)) material.color.copy(color);
+      });
     }
     group.add(part);
   }
@@ -474,7 +463,7 @@ class ModelViewer {
           result = occt[method](new Uint8Array(buffer), null);
         }
         if (!result.success || result.meshes.length === 0) throw new Error('The file could not be read');
-        return occtResultToObject(result);
+        return occtToObject(result);
       }
     }
   }

@@ -41,7 +41,6 @@ module RedmineCadPreview
     'lighting' => 'original',
     'formats' => FORMATS.keys,
     'max_file_size' => '50',
-    'dwg2dxf_command' => 'dwg2dxf',
     'conversion_timeout' => '30'
   }.freeze
 

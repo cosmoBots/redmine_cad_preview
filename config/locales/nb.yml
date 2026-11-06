@@ -10,7 +10,6 @@ nb:
   label_cad_preview_dwg: "DWG-konvertering"
   label_cad_preview_dwg2dxf_command: "dwg2dxf-kommando (LibreDWG)"
   label_cad_preview_conversion_timeout: "Tidsavbrudd for konvertering"
-  text_cad_preview_dwg_available: "DWG-konverteren er tilgjengelig."
   text_cad_preview_dwg_not_available: "DWG-konverteren er ikke tilgjengelig. DWG-filer forhåndsvises ikke."
   text_cad_preview_converting: "DWG-filen konverteres. Last inn siden på nytt om et øyeblikk."
   button_cad_preview_measure_distance: "Avstand"

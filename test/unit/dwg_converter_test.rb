@@ -101,8 +101,17 @@ class CadPreviewDwgConverterTest < ActiveSupport::TestCase
     end
   end
 
+  def test_command_should_be_read_from_the_configuration_only
+    with_cad_settings('dwg2dxf_command' => '/tmp/other') do
+      assert_equal 'dwg2dxf', RedmineCadPreview::DwgConverter.command
+      with_dwg2dxf_command('/usr/local/bin/dwg2dxf') do
+        assert_equal '/usr/local/bin/dwg2dxf', RedmineCadPreview::DwgConverter.command
+      end
+    end
+  end
+
   def test_unavailable_converter
-    with_cad_settings('dwg2dxf_command' => '/nonexistent/dwg2dxf') do
+    with_dwg2dxf_command('/nonexistent/dwg2dxf') do
       RedmineCadPreview::DwgConverter.reset_availability!
       assert_not RedmineCadPreview::DwgConverter.available?
       assert_nil RedmineCadPreview::DwgConverter.convert('/nonexistent.dwg', '/nonexistent.dxf')

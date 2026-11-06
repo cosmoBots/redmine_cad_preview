@@ -10,7 +10,6 @@ it:
   label_cad_preview_dwg: "Conversione DWG"
   label_cad_preview_dwg2dxf_command: "Comando dwg2dxf (LibreDWG)"
   label_cad_preview_conversion_timeout: "Timeout di conversione"
-  text_cad_preview_dwg_available: "Il convertitore DWG è disponibile."
   text_cad_preview_dwg_not_available: "Il convertitore DWG non è disponibile. I file DWG non hanno anteprima."
   text_cad_preview_converting: "Il file DWG è in fase di conversione. Ricarica la pagina tra poco."
   button_cad_preview_measure_distance: "Distanza"

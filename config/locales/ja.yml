@@ -10,7 +10,6 @@ ja:
   label_cad_preview_dwg: "DWG変換"
   label_cad_preview_dwg2dxf_command: "dwg2dxfコマンド (LibreDWG)"
   label_cad_preview_conversion_timeout: "変換のタイムアウト"
-  text_cad_preview_dwg_available: "DWGコンバーターは利用可能です。"
   text_cad_preview_dwg_not_available: "DWGコンバーターは利用できません。DWGファイルはプレビューされません。"
   text_cad_preview_converting: "DWGファイルを変換中です。しばらくしてからページを再読み込みしてください。"
   button_cad_preview_measure_distance: "距離"

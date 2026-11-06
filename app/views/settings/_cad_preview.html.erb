@@ -34,17 +34,20 @@
 
 <fieldset class="box">
   <legend><%= l(:label_cad_preview_dwg) %></legend>
+  <% available = RedmineCadPreview::DwgConverter.available? %>
+  <table class="list">
+    <tr>
+      <td class="name"><%= l(:label_cad_preview_dwg2dxf_command) %>: <code><%= RedmineCadPreview::DwgConverter.command %></code></td>
+      <td class="tick">
+        <span class="icon-only icon-<%= available ? 'ok' : 'error' %>">
+          <%= available ? sprite_icon('checked') : sprite_icon('warning') %>
+        </span>
+      </td>
+    </tr>
+  </table>
   <p>
-    <% if RedmineCadPreview::DwgConverter.available? %>
-      <%= sprite_icon('checked', l(:text_cad_preview_dwg_available)) %>
-    <% else %>
-      <%= sprite_icon('warning', l(:text_cad_preview_dwg_not_available)) %>
-    <% end %>
-  </p>
-  <p>
-    <%= label_tag 'settings_dwg2dxf_command', l(:label_cad_preview_dwg2dxf_command) %>
-    <%= text_field_tag 'settings[dwg2dxf_command]', RedmineCadPreview::DwgConverter.command,
-                       :id => 'settings_dwg2dxf_command', :size => 60 %>
+    <% unless available %><%= l(:text_cad_preview_dwg_not_available) %><br><% end %>
+    <em class="info"><code>dwg2dxf_command</code> in <code>config/configuration.yml</code></em>
   </p>
   <p>
     <%= label_tag 'settings_conversion_timeout', l(:label_cad_preview_conversion_timeout) %>

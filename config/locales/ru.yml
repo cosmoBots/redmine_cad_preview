@@ -10,7 +10,6 @@ ru:
   label_cad_preview_dwg: "Преобразование DWG"
   label_cad_preview_dwg2dxf_command: "Команда dwg2dxf (LibreDWG)"
   label_cad_preview_conversion_timeout: "Тайм-аут преобразования"
-  text_cad_preview_dwg_available: "Конвертер DWG доступен."
   text_cad_preview_dwg_not_available: "Конвертер DWG недоступен. Файлы DWG не просматриваются."
   text_cad_preview_converting: "Файл DWG преобразуется. Обновите страницу через некоторое время."
   button_cad_preview_measure_distance: "Расстояние"

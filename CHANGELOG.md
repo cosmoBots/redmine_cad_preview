@@ -20,6 +20,7 @@
 * perf: large drawings are rendered once when they are loaded or a view is restored, instead of several times, which made the browser report that the page is not responding
 * perf: the WebAssembly file of the STEP, IGES and BREP reader is loaded only once, also if the server does not send it as application/wasm
 * chore: the plugin has a database migration
+* fix: the command of the DWG converter is set in `config/configuration.yml` instead of the plugin settings, so that it cannot be changed in the browser; the settings page shows whether it is available
 
 ## v1.1.0 (2026-10-27)
 * feat: material (original or matte) and lighting (original or studio) in the toolbar of the 3D viewer, with the defaults in the plugin settings. The studio lighting adds reflections, so that metallic models are not displayed dark. Thanks to Txinto Vaz (cosmoBots) for the contribution (#2)

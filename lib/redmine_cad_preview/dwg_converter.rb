@@ -135,8 +135,7 @@ module RedmineCadPreview
     end
 
     # Returns true if the configured command can be run. The result is cached
-    # for each command, so that changing the command in the settings takes
-    # effect immediately.
+    # for each command.
     def self.available?
       @available ||= {}
       return @available[command] if @available.key?(command)
@@ -155,7 +154,9 @@ module RedmineCadPreview
     end
 
     def self.command
-      RedmineCadPreview.settings['dwg2dxf_command'].presence || DEFAULT_SETTINGS['dwg2dxf_command']
+      # Only in config/configuration.yml: a command in the plugin settings could
+      # be changed by an administrator in the browser and would run any program
+      Redmine::Configuration['dwg2dxf_command'].presence || 'dwg2dxf'
     end
 
     def self.timeout

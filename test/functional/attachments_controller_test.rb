@@ -274,7 +274,7 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
   def test_show_dwg_file_without_converter_should_not_show_preview
     attachment = create_cad_attachment('drawing.dwg')
 
-    with_cad_settings('dwg2dxf_command' => '/nonexistent/dwg2dxf') do
+    with_dwg2dxf_command('/nonexistent/dwg2dxf') do
       RedmineCadPreview::DwgConverter.reset_availability!
       get(:show, :params => {:id => attachment.id})
     end

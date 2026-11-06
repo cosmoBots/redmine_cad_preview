@@ -10,7 +10,6 @@ ko:
   label_cad_preview_dwg: "DWG 변환"
   label_cad_preview_dwg2dxf_command: "dwg2dxf 명령 (LibreDWG)"
   label_cad_preview_conversion_timeout: "변환 제한 시간"
-  text_cad_preview_dwg_available: "DWG 변환기를 사용할 수 있습니다."
   text_cad_preview_dwg_not_available: "DWG 변환기를 사용할 수 없습니다. DWG 파일은 미리보기되지 않습니다."
   text_cad_preview_converting: "DWG 파일을 변환하는 중입니다. 잠시 후 페이지를 새로 고치십시오."
   button_cad_preview_measure_distance: "거리"

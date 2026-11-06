@@ -54,7 +54,7 @@ module RedmineCadPreview
 
     def without_dwg2dxf(&)
       RedmineCadPreview::DwgConverter.reset_availability!
-      with_cad_settings({'dwg2dxf_command' => '/nonexistent/dwg2dxf'}, &)
+      with_dwg2dxf_command('/nonexistent/dwg2dxf', &)
     ensure
       RedmineCadPreview::DwgConverter.reset_availability!
     end
@@ -72,6 +72,13 @@ module RedmineCadPreview
       FileUtils.rm_rf(RedmineCadPreview::DwgConverter.storage_path)
     end
 
+    # Redmine::Configuration.with returns the configuration, not the result of the block
+    def with_dwg2dxf_command(command)
+      result = nil
+      Redmine::Configuration.with('dwg2dxf_command' => command) { result = yield }
+      result
+    end
+
     def with_cad_settings(settings, &)
       with_settings(:plugin_redmine_cad_preview => RedmineCadPreview::DEFAULT_SETTINGS.merge(settings), &)
     end
@@ -81,7 +88,7 @@ module RedmineCadPreview
       RedmineCadPreview::DwgConverter.reset_availability!
       previous = ENV.fetch('FAKE_DWG2DXF_MODE', nil)
       ENV['FAKE_DWG2DXF_MODE'] = mode
-      with_cad_settings({'dwg2dxf_command' => FAKE_DWG2DXF, 'conversion_timeout' => timeout}, &)
+      with_dwg2dxf_command(FAKE_DWG2DXF) { with_cad_settings({'conversion_timeout' => timeout}, &) }
     ensure
       ENV['FAKE_DWG2DXF_MODE'] = previous
       RedmineCadPreview::DwgConverter.reset_availability!

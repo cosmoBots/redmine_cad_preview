@@ -10,7 +10,6 @@ sv:
   label_cad_preview_dwg: "DWG-konvertering"
   label_cad_preview_dwg2dxf_command: "dwg2dxf-kommando (LibreDWG)"
   label_cad_preview_conversion_timeout: "Tidsgräns för konvertering"
-  text_cad_preview_dwg_available: "DWG-konverteraren är tillgänglig."
   text_cad_preview_dwg_not_available: "DWG-konverteraren är inte tillgänglig. DWG-filer förhandsgranskas inte."
   text_cad_preview_converting: "DWG-filen konverteras. Ladda om sidan om en stund."
   button_cad_preview_measure_distance: "Avstånd"

@@ -31,7 +31,7 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **Download of the current view** – As PNG image or PDF (A4) with the measurement, the file name and the dimensions. Created in the browser, without an additional library. The file name contains the name of the saved view if the view has not been changed.
 - **Maximize and full screen** – Maximize the viewer to the browser window (remembered in the browser) or switch to full screen
 - **Background conversion of DWG files** – Started after the upload. A failed conversion is attempted at most twice, so opening the preview does not start a new conversion every time.
-- **Settings** – Previewed formats, maximum file size, default material and lighting, DWG converter command and timeout
+- **Settings** – Previewed formats, maximum file size, default material and lighting, DWG conversion timeout
 - **API for other plugins** – Other plugins can set the material and lighting of an attachment, read and save the views of attachments in Ruby or with the REST API, and save and restore the view of the viewer in JavaScript (see [API for other plugins](#-api-for-other-plugins))
 - **No additional gems**
 
@@ -51,10 +51,18 @@ Configure the plugin under **Administration → Plugins → Redmine CAD Preview 
 | Maximum file size             | Larger files are not previewed (default: 50 MB). The file is loaded and converted to triangles in the browser, which needs a multiple of the file size in memory. On the server, the file is sent like a download, so the limit only matters for the DWG conversion, which runs as a separate process. |
 | Material                      | Material of 3D models when the preview is opened: original or matte (default: original) |
 | Lighting                      | Lighting of 3D models when the preview is opened: original or studio (default: original) |
-| dwg2dxf command (LibreDWG)    | Command of the DWG converter, e.g. `/usr/local/bin/dwg2dxf` (default: `dwg2dxf`) |
 | Conversion timeout            | Maximum time of a DWG conversion in seconds (default: 30)                   |
 
-The settings page shows whether the DWG converter is available. Without it, DWG files are not previewed, and all other formats still work.
+The command of the DWG converter is not a plugin setting, so that it cannot be changed in the browser. Like the commands of ImageMagick, Ghostscript and Pandoc, it can be set in `config/configuration.yml` of Redmine. Without it, `dwg2dxf` is found in the `PATH` of Redmine:
+
+```yaml
+default:
+  # Absolute path (e.g. /usr/local/bin/dwg2dxf) to the `dwg2dxf` command
+  # of LibreDWG. Used to convert DWG files for the CAD preview.
+  #dwg2dxf_command:
+```
+
+Restart Redmine after changing it. The settings page shows whether the DWG converter is available. Without it, DWG files are not previewed, and all other formats still work.
 
 ## 📝 Macro
 

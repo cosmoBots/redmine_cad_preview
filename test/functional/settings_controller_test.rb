@@ -23,7 +23,9 @@ class CadPreviewSettingsControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_select 'input[type=checkbox][name=?]', 'settings[formats][]', RedmineCadPreview::FORMATS.size
     assert_select 'input[name=?][value="50"]', 'settings[max_file_size]'
-    assert_select 'input[name=?]', 'settings[dwg2dxf_command]'
+    assert_select 'input[name=?]', 'settings[dwg2dxf_command]', 0
+    assert_select 'table.list td.name code', :text => RedmineCadPreview::DwgConverter.command
+    assert_select 'table.list td.tick span.icon-only', 1
     assert_select 'input[name=?]', 'settings[conversion_timeout]'
     assert_select 'select[name=?] option[selected][value=original]', 'settings[material_mode]'
     assert_select 'select[name=?] option[selected][value=original]', 'settings[lighting]'
@@ -32,7 +34,7 @@ class CadPreviewSettingsControllerTest < Redmine::ControllerTest
   def test_update_plugin_settings
     post(:plugin, :params => {:id => 'redmine_cad_preview',
                               :settings => {'formats' => ['step', 'dxf', ''], 'max_file_size' => '20',
-                                            'dwg2dxf_command' => 'dwg2dxf', 'conversion_timeout' => '60',
+                                            'conversion_timeout' => '60',
                                             'material_mode' => 'matte', 'lighting' => 'studio'}})
     assert_redirected_to '/settings/plugin/redmine_cad_preview'
     assert_equal ['step', 'dxf'], RedmineCadPreview.enabled_formats

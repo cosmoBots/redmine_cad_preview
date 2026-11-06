@@ -1,6 +1,10 @@
 ja:
   button_cad_preview_fit: "全体表示"
   button_cad_preview_wireframe: "ワイヤーフレーム"
+  button_cad_preview_parts: "部品"
+  button_cad_preview_show_all_parts: "すべて表示"
+  label_cad_preview_toggle_part: "表示/非表示"
+  label_cad_preview_show_only_part: "この部品のみ表示"
   text_cad_preview_hint_3d: "ドラッグで回転、ホイールでズーム、右ドラッグで移動します。"
   text_cad_preview_hint_2d: "ホイールでズーム、ドラッグで移動します。"
   text_cad_preview_error: "ファイルを表示できませんでした。代わりにダウンロードしてください。"

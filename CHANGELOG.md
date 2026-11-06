@@ -2,6 +2,7 @@
 
 ## v1.3.0 (unreleased)
 * feat: the colors of single faces of STEP models are shown, not only the color of the body #5
+* feat: parts of assemblies (STEP, IGES, BREP) in a panel: show and hide parts, show only one part and fit the view to it; the hidden parts are saved with the view #6
 
 ## v1.2.1 (2026-11-06)
 * feat: saved views of CAD attachments: save the current view under a name and restore it from the toolbar, for 3D models and 2D drawings (#3)

@@ -1,6 +1,10 @@
 de:
   button_cad_preview_fit: "Einpassen"
   button_cad_preview_wireframe: "Drahtgitter"
+  button_cad_preview_parts: "Teile"
+  button_cad_preview_show_all_parts: "Alle anzeigen"
+  label_cad_preview_toggle_part: "Ein- oder ausblenden"
+  label_cad_preview_show_only_part: "Nur dieses Teil anzeigen"
   text_cad_preview_hint_3d: "Ziehen zum Drehen, Mausrad zum Zoomen, mit rechter Maustaste ziehen zum Verschieben."
   text_cad_preview_hint_2d: "Mausrad zum Zoomen, Ziehen zum Verschieben."
   text_cad_preview_error: "Die Datei konnte nicht angezeigt werden. Bitte stattdessen herunterladen."

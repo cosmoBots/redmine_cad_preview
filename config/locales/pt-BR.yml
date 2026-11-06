@@ -1,6 +1,10 @@
 pt-BR:
   button_cad_preview_fit: "Ajustar à visualização"
   button_cad_preview_wireframe: "Aramado"
+  button_cad_preview_parts: "Peças"
+  button_cad_preview_show_all_parts: "Mostrar tudo"
+  label_cad_preview_toggle_part: "Mostrar ou ocultar"
+  label_cad_preview_show_only_part: "Mostrar apenas esta peça"
   text_cad_preview_hint_3d: "Arraste para girar, use a roda para ampliar, arraste com o botão direito para mover."
   text_cad_preview_hint_2d: "Use a roda para ampliar, arraste para mover."
   text_cad_preview_error: "Não foi possível exibir o arquivo. Faça o download dele em vez disso."

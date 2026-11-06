@@ -40,7 +40,11 @@ class CadPreviewAttachmentsControllerTest < Redmine::ControllerTest
     assert_select 'a.cad-preview-exit-fullscreen[data-cad-action=fullscreen]'
     assert_select 'a[data-cad-action=download-png][title=?]', 'Download (PNG)'
     assert_select 'a[data-cad-action=download-pdf][title=?]', 'Download (PDF)'
-    assert_select '.cad-preview-toolbar svg use[href*="plugin_assets/redmine_cad_preview/icons"]', 10
+    assert_select '.cad-preview-toolbar svg use[href*="plugin_assets/redmine_cad_preview/icons"]', 11
+    # Parts of assemblies, shown by the viewer if the model has more than one part
+    assert_select 'a[data-cad-action=parts][hidden]'
+    assert_select '.cad-preview-canvas .cad-preview-parts[hidden] button[data-cad-parts-show-all]', :text => 'Show all'
+    assert_select 'template.cad-preview-part-template'
     assert_select '.cad-preview-info span.cad-preview-dimensions'
     assert_select 'script[type=module][src*=cad_preview]'
   end

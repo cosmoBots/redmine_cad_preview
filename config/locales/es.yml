@@ -1,6 +1,10 @@
 es:
   button_cad_preview_fit: "Ajustar a la vista"
   button_cad_preview_wireframe: "Malla"
+  button_cad_preview_parts: "Piezas"
+  button_cad_preview_show_all_parts: "Mostrar todo"
+  label_cad_preview_toggle_part: "Mostrar u ocultar"
+  label_cad_preview_show_only_part: "Mostrar solo esta pieza"
   text_cad_preview_hint_3d: "Arrastre para girar, use la rueda para hacer zoom, arrastre con el botón derecho para desplazar."
   text_cad_preview_hint_2d: "Use la rueda para hacer zoom, arrastre para desplazar."
   text_cad_preview_error: "No se pudo mostrar el archivo. Descárguelo en su lugar."

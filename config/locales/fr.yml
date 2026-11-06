@@ -1,6 +1,10 @@
 fr:
   button_cad_preview_fit: "Ajuster à la vue"
   button_cad_preview_wireframe: "Fil de fer"
+  button_cad_preview_parts: "Pièces"
+  button_cad_preview_show_all_parts: "Tout afficher"
+  label_cad_preview_toggle_part: "Afficher ou masquer"
+  label_cad_preview_show_only_part: "Afficher uniquement cette pièce"
   text_cad_preview_hint_3d: "Faites glisser pour pivoter, molette pour zoomer, clic droit et glisser pour déplacer."
   text_cad_preview_hint_2d: "Molette pour zoomer, faites glisser pour déplacer."
   text_cad_preview_error: "Le fichier n'a pas pu être affiché. Téléchargez-le à la place."

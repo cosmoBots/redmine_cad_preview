@@ -1,6 +1,7 @@
 // Generic, versioned camera state. No persistence or cosmoSys dependency.
 export function readView(viewer) {
   const camera = viewer.camera;
+  const hidden = viewer.hiddenParts?.() || [];
   return {
     version: 1, projection: camera.isOrthographicCamera ? 'orthographic' : 'perspective',
     position: camera.position.toArray(), target: viewer.controls.target.toArray(),
@@ -10,7 +11,9 @@ export function readView(viewer) {
     aspect: viewer.canvas.width / viewer.canvas.height,
     material: viewer.element.dataset.materialMode || 'original',
     lighting: viewer.element.dataset.lighting || 'original',
-    background: `#${viewer.scene.background.getHexString()}`, wireframe: viewer.wireframe
+    background: `#${viewer.scene.background.getHexString()}`, wireframe: viewer.wireframe,
+    // Only if parts are hidden, so that the views saved before are unchanged
+    ...(hidden.length > 0 ? { hidden } : {})
   };
 }
 
@@ -33,6 +36,7 @@ export function applyView(viewer, state) {
   viewer.setMaterialMode(state.material);
   viewer.setLighting(state.lighting);
   if (viewer.wireframe !== state.wireframe) viewer.toggleWireframe();
+  viewer.setHiddenParts?.(state.hidden || []);
   viewer.resize();
   viewer.controls.update();
   viewer.controls.enableDamping = damping;

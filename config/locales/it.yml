@@ -1,6 +1,10 @@
 it:
   button_cad_preview_fit: "Adatta alla vista"
   button_cad_preview_wireframe: "Wireframe"
+  button_cad_preview_parts: "Parti"
+  button_cad_preview_show_all_parts: "Mostra tutto"
+  label_cad_preview_toggle_part: "Mostra o nascondi"
+  label_cad_preview_show_only_part: "Mostra solo questa parte"
   text_cad_preview_hint_3d: "Trascina per ruotare, rotellina per lo zoom, trascina con il tasto destro per spostare."
   text_cad_preview_hint_2d: "Rotellina per lo zoom, trascina per spostare."
   text_cad_preview_error: "Impossibile visualizzare il file. Scaricalo invece."

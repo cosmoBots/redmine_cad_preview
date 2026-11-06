@@ -1,6 +1,10 @@
 zh:
   button_cad_preview_fit: "适应视图"
   button_cad_preview_wireframe: "线框"
+  button_cad_preview_parts: "零件"
+  button_cad_preview_show_all_parts: "全部显示"
+  label_cad_preview_toggle_part: "显示/隐藏"
+  label_cad_preview_show_only_part: "仅显示此零件"
   text_cad_preview_hint_3d: "拖动旋转,滚轮缩放,右键拖动平移。"
   text_cad_preview_hint_2d: "滚轮缩放,拖动平移。"
   text_cad_preview_error: "无法显示该文件,请下载。"

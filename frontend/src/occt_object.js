@@ -37,10 +37,36 @@ export function faceColorGroups(faces, triangleCount) {
   return groups.map(({ first, last, color }) => [first * 3, (last - first + 1) * 3, color]);
 }
 
-// materialFor(color) returns a new material of the color
-export function occtResultToObject(result, materialFor, defaultColor) {
+// Groups of the nodes of the product tree (assemblies and parts), with their
+// names. A mesh used by several nodes is cloned, the geometry is shared.
+function nodeToObject(node, meshes) {
   const group = new THREE.Group();
-  for (const mesh of result.meshes) {
+  group.name = node.name || '';
+  for (const index of node.meshes || []) {
+    const mesh = meshes[index];
+    if (mesh) group.add(mesh.parent ? mesh.clone() : mesh);
+  }
+  for (const child of node.children || []) group.add(nodeToObject(child, meshes));
+  return group;
+}
+
+// materialFor(color) returns a new material of the color. The object has the
+// hierarchy of the product tree if the file has one.
+export function occtResultToObject(result, materialFor, defaultColor) {
+  const meshes = meshesOf(result, materialFor, defaultColor);
+  if (!result.root) {
+    const group = new THREE.Group();
+    meshes.forEach((mesh) => group.add(mesh));
+    return group;
+  }
+  const object = nodeToObject(result.root, meshes);
+  // Meshes that no node uses are shown as well
+  meshes.filter((mesh) => !mesh.parent).forEach((mesh) => object.add(mesh));
+  return object;
+}
+
+function meshesOf(result, materialFor, defaultColor) {
+  return result.meshes.map((mesh) => {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(mesh.attributes.position.array, 3));
     if (mesh.attributes.normal) {
@@ -51,23 +77,24 @@ export function occtResultToObject(result, materialFor, defaultColor) {
 
     const bodyColor = colorOf(mesh.color) || new THREE.Color(defaultColor);
     const groups = faceColorGroups(mesh.brep_faces, mesh.index.array.length / 3);
-    if (!groups) {
-      group.add(new THREE.Mesh(geometry, materialFor(bodyColor)));
-      continue;
-    }
-
-    // One material per color, shared by the groups of this color
-    const materials = [];
-    const indexOf = new Map();
-    for (const [start, count, rgb] of groups) {
-      const key = rgb ? rgb.join(',') : 'body';
-      if (!indexOf.has(key)) {
-        indexOf.set(key, materials.length);
-        materials.push(materialFor(colorOf(rgb) || bodyColor));
+    let object;
+    if (groups) {
+      // One material per color, shared by the groups of this color
+      const materials = [];
+      const indexOf = new Map();
+      for (const [start, count, rgb] of groups) {
+        const key = rgb ? rgb.join(',') : 'body';
+        if (!indexOf.has(key)) {
+          indexOf.set(key, materials.length);
+          materials.push(materialFor(colorOf(rgb) || bodyColor));
+        }
+        geometry.addGroup(start, count, indexOf.get(key));
       }
-      geometry.addGroup(start, count, indexOf.get(key));
+      object = new THREE.Mesh(geometry, materials);
+    } else {
+      object = new THREE.Mesh(geometry, materialFor(bodyColor));
     }
-    group.add(new THREE.Mesh(geometry, materials));
-  }
-  return group;
+    object.name = mesh.name || '';
+    return object;
+  });
 }

@@ -28,6 +28,8 @@ import { ModelAppearance, StudioLighting } from './model_appearance.js';
 import { readView, applyView } from './view_state.js';
 import { SavedViews } from './saved_views.js';
 import { occtResultToObject } from './occt_object.js';
+import { hasParts, hiddenParts, isShown, setHiddenParts, showOnly, visibleBox } from './part_tree.js';
+import { PartsPanel } from './parts_panel.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -380,6 +382,8 @@ class ModelViewer {
   async load() {
     const buffer = await fetchFile(this.element.dataset.url);
     this.object = prepareObject(await this.parse(buffer));
+    // Parts of assemblies can be shown and hidden (STEP, IGES, BREP)
+    this.parts = OCCT_FORMATS[this.format] && hasParts(this.object) ? this.object : null;
     this.appearance = new ModelAppearance(this.object);
     this.setMaterialMode(this.element.dataset.materialMode || 'original');
     this.scene.add(this.object);
@@ -504,6 +508,32 @@ class ModelViewer {
   exportView() { return readView(this); }
   restoreView(state) { applyView(this, state); }
 
+  // Paths of the hidden parts, see part_tree.js
+  hiddenParts() {
+    return this.parts ? hiddenParts(this.parts) : [];
+  }
+
+  setHiddenParts(paths) {
+    if (!this.parts) return;
+    setHiddenParts(this.parts, paths);
+    this.partsChanged?.();
+    this.requestRender();
+  }
+
+  togglePart(object) {
+    object.visible = !object.visible;
+    this.partsChanged?.();
+    this.requestRender();
+  }
+
+  // Shows only the part and fits the camera to it
+  showOnlyPart(object) {
+    showOnly(this.parts, object);
+    this.partsChanged?.();
+    this.fit();
+    this.requestRender();
+  }
+
   getRenderContext() {
     return { canvas: this.canvas, renderer: this.renderer, scene: this.scene,
              render: () => this.render() };
@@ -521,7 +551,7 @@ class ModelViewer {
     const pointer = new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1,
                                       -((clientY - rect.top) / rect.height) * 2 + 1);
     this.raycaster.setFromCamera(pointer, this.camera);
-    const hit = this.raycaster.intersectObject(this.object, true)[0];
+    const hit = this.raycaster.intersectObject(this.object, true).find((h) => isShown(h.object, this.object));
     return hit ? hit.point.clone() : null;
   }
 
@@ -549,10 +579,10 @@ class ModelViewer {
     this.render();
   }
 
-  // Moves the camera so that the whole model is visible
+  // Moves the camera so that the parts that are shown are visible
   fit() {
     if (!this.object) return;
-    const box = new THREE.Box3().setFromObject(this.object);
+    const box = this.parts ? visibleBox(this.object) : new THREE.Box3().setFromObject(this.object);
     if (box.isEmpty()) return;
     const center = box.getCenter(new THREE.Vector3());
     const radius = box.getSize(new THREE.Vector3()).length() / 2 || 1;
@@ -976,6 +1006,10 @@ async function initialize(element) {
     onClick(viewer.canvas, (event) => measurement.click(event.clientX, event.clientY));
     showDimensions(element, viewer, i18n);
     showSolidsNotice(element, viewer, i18n);
+    if (viewer.parts) {
+      const parts = new PartsPanel(element, viewer);
+      actions.parts = () => parts.toggle();
+    }
     status.hidden = true;
     if (element.dataset.viewsUrl) {
       views = new SavedViews(element, viewer, i18n);

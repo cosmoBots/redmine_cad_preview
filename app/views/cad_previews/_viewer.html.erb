@@ -79,6 +79,10 @@
         <%= button.('maximize', l(:button_cad_preview_fullscreen), 'fullscreen', :css_class => 'cad-preview-fullscreen') %>
         <%= button.('minimize', l(:button_cad_preview_exit_fullscreen), 'fullscreen', :css_class => 'cad-preview-exit-fullscreen') %>
         <%= button.('zoom-scan', l(:button_cad_preview_fit), 'fit') %>
+        <% if RedmineCadPreview::OCCT_FORMATS.include?(format) %>
+          <%# Shown by the viewer if the model has more than one part %>
+          <%= button.('list-tree', l(:button_cad_preview_parts), 'parts', :hidden => true) %>
+        <% end %>
       </span>
       <% unless format == 'dxf' %>
         <span class="cad-preview-toolbar-group">
@@ -137,6 +141,24 @@
       <% if placeholder %>
         <%= image_tag download_named_attachment_path(placeholder, placeholder.filename), :alt => '',
                       :class => "cad-preview-placeholder#{' cad-preview-placeholder-drawing' if format == 'dxf'}" %>
+      <% end %>
+      <% if RedmineCadPreview::OCCT_FORMATS.include?(format) %>
+        <div class="cad-preview-parts" hidden>
+          <div class="cad-preview-parts-header">
+            <strong><%= l(:button_cad_preview_parts) %></strong>
+            <button type="button" data-cad-parts-show-all><%= l(:button_cad_preview_show_all_parts) %></button>
+          </div>
+          <ul class="cad-preview-parts-tree"></ul>
+        </div>
+        <template class="cad-preview-part-template">
+          <li class="cad-preview-part">
+            <button type="button" class="cad-preview-part-toggle" data-cad-part-toggle title="<%= l(:label_cad_preview_toggle_part) %>">
+              <span class="cad-preview-part-shown"><%= sprite_icon('eye', :plugin => 'redmine_cad_preview') %></span>
+              <span class="cad-preview-part-hidden-icon"><%= sprite_icon('eye-off', :plugin => 'redmine_cad_preview') %></span>
+            </button>
+            <button type="button" class="cad-preview-part-name" data-cad-part-name title="<%= l(:label_cad_preview_show_only_part) %>"></button>
+          </li>
+        </template>
       <% end %>
       <div class="cad-preview-status"><%= l(:label_loading) %></div>
     </div>

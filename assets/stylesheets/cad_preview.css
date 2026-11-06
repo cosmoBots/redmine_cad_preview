@@ -118,6 +118,81 @@
   paint-order: stroke;
 }
 
+/* Parts of assemblies, over the left side of the view */
+.cad-preview-parts {
+  position: absolute;
+  inset-block: 8px;
+  inset-inline-start: 8px;
+  z-index: 2;
+  inline-size: min(280px, 45%);
+  overflow: auto;
+  padding: 6px 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  background: var(--color-background, #fff);
+  opacity: 0.95;
+  font-size: 0.9em;
+}
+
+.cad-preview-parts[hidden] {
+  display: none;
+}
+
+.cad-preview-parts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-block-end: 4px;
+}
+
+.cad-preview-parts ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cad-preview-parts ul ul {
+  padding-inline-start: 18px;
+}
+
+.cad-preview-part > button {
+  padding: 1px 2px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.cad-preview-part-name:hover {
+  text-decoration: underline;
+}
+
+.cad-preview-part-hidden-icon,
+.cad-preview-part-hidden > .cad-preview-part-toggle .cad-preview-part-shown {
+  display: none;
+}
+
+.cad-preview-part-hidden > .cad-preview-part-toggle .cad-preview-part-hidden-icon {
+  display: inline;
+}
+
+.cad-preview-part-inactive > .cad-preview-part-name {
+  color: var(--color-text-muted, #6b737b);
+}
+
+/* On narrow screens over the top of the view */
+@media (max-width: 640px) {
+  .cad-preview-parts {
+    inset-inline-end: 8px;
+    inset-block-end: auto;
+    inline-size: auto;
+    max-block-size: 40%;
+  }
+}
+
 /* Maximized (fills the browser window) and fullscreen */
 .cad-preview-maximized,
 .cad-preview:fullscreen {

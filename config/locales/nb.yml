@@ -1,6 +1,10 @@
 nb:
   button_cad_preview_fit: "Tilpass til visning"
   button_cad_preview_wireframe: "Trådramme"
+  button_cad_preview_parts: "Deler"
+  button_cad_preview_show_all_parts: "Vis alle"
+  label_cad_preview_toggle_part: "Vis eller skjul"
+  label_cad_preview_show_only_part: "Vis bare denne delen"
   text_cad_preview_hint_3d: "Dra for å rotere, rull for å zoome, høyreklikk og dra for å panorere."
   text_cad_preview_hint_2d: "Rull for å zoome, dra for å panorere."
   text_cad_preview_error: "Filen kunne ikke vises. Last den ned i stedet."

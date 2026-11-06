@@ -1,6 +1,10 @@
 ru:
   button_cad_preview_fit: "Вписать в окно"
   button_cad_preview_wireframe: "Каркас"
+  button_cad_preview_parts: "Детали"
+  button_cad_preview_show_all_parts: "Показать все"
+  label_cad_preview_toggle_part: "Показать или скрыть"
+  label_cad_preview_show_only_part: "Показать только эту деталь"
   text_cad_preview_hint_3d: "Перетащите для вращения, колесо — масштаб, правая кнопка — перемещение."
   text_cad_preview_hint_2d: "Колесо — масштаб, перетаскивание — перемещение."
   text_cad_preview_error: "Не удалось отобразить файл. Скачайте его."

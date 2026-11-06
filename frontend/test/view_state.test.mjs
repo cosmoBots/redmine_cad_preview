@@ -61,3 +61,19 @@ test('unsupported camera state version is not applied', () => {
   assert.throws(() => applyView(viewer, { version: 2 }), /Unsupported/);
   assert.equal(viewer.camera, camera);
 });
+
+test('hidden parts are saved only if there are any and restored with the view', () => {
+  const viewer = fixture();
+  let hidden = [];
+  viewer.hiddenParts = () => hidden;
+  viewer.setHiddenParts = (paths) => { hidden = paths; };
+  assert.equal('hidden' in readView(viewer), false);
+  hidden = ['asm/bolts'];
+  const state = readView(viewer);
+  assert.deepEqual(state.hidden, ['asm/bolts']);
+  hidden = [];
+  applyView(viewer, state);
+  assert.deepEqual(hidden, ['asm/bolts']);
+  applyView(viewer, { ...state, hidden: undefined });
+  assert.deepEqual(hidden, []);
+});

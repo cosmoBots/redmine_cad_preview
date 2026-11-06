@@ -1,6 +1,10 @@
 pl:
   button_cad_preview_fit: "Dopasuj do widoku"
   button_cad_preview_wireframe: "Siatka"
+  button_cad_preview_parts: "Części"
+  button_cad_preview_show_all_parts: "Pokaż wszystkie"
+  label_cad_preview_toggle_part: "Pokaż lub ukryj"
+  label_cad_preview_show_only_part: "Pokaż tylko tę część"
   text_cad_preview_hint_3d: "Przeciągnij, aby obrócić, kółko myszy, aby powiększyć, przeciągnij prawym przyciskiem, aby przesunąć."
   text_cad_preview_hint_2d: "Kółko myszy, aby powiększyć, przeciągnij, aby przesunąć."
   text_cad_preview_error: "Nie można wyświetlić pliku. Pobierz go zamiast tego."

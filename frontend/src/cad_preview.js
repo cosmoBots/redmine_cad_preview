@@ -32,6 +32,7 @@ import { hasParts, hiddenParts, isShown, setHiddenParts, showOnly, visibleBox } 
 import { PartsPanel } from './parts_panel.js';
 import { SectionView } from './section_view.js';
 import { SectionPanel } from './section_panel.js';
+import { drawWorldAxes } from './world_axes.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -362,6 +363,11 @@ class ModelViewer {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, stencil: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.canvasContainer.appendChild(this.renderer.domElement);
+    this.axesVisible = true;
+    this.axesCanvas = document.createElement('canvas');
+    this.axesCanvas.className = 'cad-preview-world-axes';
+    this.axesCanvas.setAttribute('aria-hidden', 'true');
+    this.canvasContainer.appendChild(this.axesCanvas);
 
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 2.5));
     this.camera.add(new THREE.DirectionalLight(0xffffff, 1.5));
@@ -514,6 +520,17 @@ class ModelViewer {
   exportView() { return readView(this); }
   restoreView(state) { applyView(this, state); }
 
+  setAxesVisible(visible) {
+    this.axesVisible = !!visible;
+    this.axesCanvas.hidden = !this.axesVisible;
+    this.element.querySelector('[data-cad-action="world-axes"]')?.setAttribute('aria-pressed', String(this.axesVisible));
+    this.requestRender();
+  }
+
+  drawAxes(context, width, height, pixelRatio = 1) {
+    if (this.axesVisible) drawWorldAxes(context, this.camera, width, height, pixelRatio);
+  }
+
   // Paths of the hidden parts, see part_tree.js
   hiddenParts() {
     return this.parts ? hiddenParts(this.parts) : [];
@@ -596,6 +613,13 @@ class ModelViewer {
   render() {
     this.section?.beforeRender();
     this.renderer.render(this.scene, this.camera);
+    const ratio = this.renderer.getPixelRatio();
+    const size = Math.max(1, Math.round(Math.min(88, this.canvas.clientWidth, this.canvas.clientHeight) * ratio));
+    this.axesCanvas.width = size;
+    this.axesCanvas.height = size;
+    this.axesCanvas.style.width = `${size / ratio}px`;
+    this.axesCanvas.style.height = `${size / ratio}px`;
+    this.drawAxes(this.axesCanvas.getContext('2d'), size, size, ratio);
   }
 
   // Draws the current view without background on a 2D context
@@ -825,6 +849,7 @@ function captureView(element, viewer, measurement) {
   context.fillRect(0, 0, width, height + captionHeight);
   viewer.render();
   context.drawImage(source, 0, 0, width, height);
+  viewer.drawAxes?.(context, width, height);
   measurement.draw(context);
 
   context.fillStyle = '#212529';
@@ -919,6 +944,7 @@ async function sendSnapshot(element, viewer) {
   canvas.height = Math.round(source.height * scale);
   viewer.render();
   canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
+  viewer.drawAxes?.(canvas.getContext('2d'), canvas.width, canvas.height);
 
   const token = document.querySelector('meta[name="csrf-token"]')?.content;
   await fetch(element.dataset.snapshotUrl, {
@@ -1028,6 +1054,7 @@ async function initialize(element) {
   const actions = {
     fit: () => viewer.fit(),
     wireframe: () => viewer.toggleWireframe(),
+    'world-axes': () => viewer.setAxesVisible(!viewer.axesVisible),
     'measure-distance': () => measurement.toggle('distance'),
     'measure-angle': () => measurement.toggle('angle'),
     maximize: () => setMaximized(element, !element.classList.contains('cad-preview-maximized')),

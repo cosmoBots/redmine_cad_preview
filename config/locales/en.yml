@@ -1,4 +1,5 @@
 en:
+  button_cad_preview_world_axes: "World axes"
   label_cad_preview_material_mode: "Material"
   label_cad_preview_lighting: "Lighting"
   label_cad_preview_original: "Original"

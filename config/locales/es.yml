@@ -1,4 +1,5 @@
 es:
+  button_cad_preview_world_axes: "Ejes del mundo"
   button_cad_preview_fit: "Ajustar a la vista"
   button_cad_preview_wireframe: "Malla"
   button_cad_preview_parts: "Piezas"

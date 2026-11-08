@@ -43,7 +43,8 @@ export function sameState(a, b) {
   if (a && b && typeof a === 'object' && typeof b === 'object') {
     const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
     keys.delete('aspect');
-    return [...keys].every((key) => sameState(a[key], b[key]));
+    return [...keys].every((key) => key === 'axes'
+      ? (a[key] !== false) === (b[key] !== false) : sameState(a[key], b[key]));
   }
   return a === b;
 }
@@ -72,6 +73,7 @@ export function captureImage(viewer) {
   canvas.height = size.height;
   canvas.getContext('2d').drawImage(full, bounds.x, bounds.y, bounds.width, bounds.height,
                                     0, 0, size.width, size.height);
+  viewer.drawAxes?.(canvas.getContext('2d'), size.width, size.height);
   return canvas;
 }
 

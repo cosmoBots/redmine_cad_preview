@@ -13,6 +13,7 @@ export function readView(viewer) {
     material: viewer.element.dataset.materialMode || 'original',
     lighting: viewer.element.dataset.lighting || 'original',
     background: `#${viewer.scene.background.getHexString()}`, wireframe: viewer.wireframe,
+    axes: viewer.axesVisible !== false,
     // Only if parts are hidden, so that the views saved before are unchanged
     ...(hidden.length > 0 ? { hidden } : {}),
     // Only if the model is cut: {axis, position, flip}
@@ -38,6 +39,7 @@ export function applyView(viewer, state) {
   viewer.scene.background.set(state.background);
   viewer.setMaterialMode(state.material);
   viewer.setLighting(state.lighting);
+  viewer.setAxesVisible?.(state.axes !== false);
   if (viewer.wireframe !== state.wireframe) viewer.toggleWireframe();
   viewer.setHiddenParts?.(state.hidden || []);
   viewer.setSection?.(state.section || null);

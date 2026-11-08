@@ -11,7 +11,7 @@ import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 const ICONS = ['zoom-scan', 'box', 'ruler-measure', 'angle',
                'arrows-maximize', 'arrows-minimize', 'maximize', 'minimize',
                'file-type-png', 'file-type-pdf', 'file-3d', 'file-vector',
-               'list-tree', 'eye', 'eye-off', 'slice', 'arrows-exchange'];
+               'list-tree', 'eye', 'eye-off', 'slice', 'arrows-exchange', 'axis-x'];
 
 const assets = new URL('../assets/', import.meta.url).pathname;
 

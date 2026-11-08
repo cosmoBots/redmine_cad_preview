@@ -24,6 +24,7 @@ This plugin shows CAD attachments directly in Redmine: 3D models can be rotated,
 - **Thumbnails** – CAD attachments get thumbnails in the attachment lists, like images (with ImageMagick, if thumbnails are enabled in the Redmine settings)
 - **File icons** – 3D models and 2D drawings get their own icons in the attachment lists, from Redmine 7.0 (which shows file type icons there). Redmine 7.0 only passes the content type, so only files with a CAD content type get the icons there, e.g. DWG, DXF, STL and IGES. Redmine trunk also passes the filename, so all CAD files get the icons. Icons of the theme are used first.
 - **Viewer controls** – Rotate, zoom, pan, fit to view, wireframe
+- **World axes** – A small X (red), Y (green), Z (blue) orientation indicator in the lower-right corner of 3D views. Visible by default; toggle **World axes** to hide it. Its visibility is saved with the view and respected in PNG/PDF downloads and saved images. The indicator is added after cropping saved images, without retaining empty viewport margins.
 - **Parts of assemblies** – STEP, IGES and BREP files with several parts show their product tree in a panel: parts and assemblies can be shown and hidden, and clicking a name shows only this part and fits the view to it. The hidden parts are saved with the view.
 - **Colors** – The colors of the bodies and of single faces of STEP models are shown
 - **Section view** – 3D models can be cut along the X, Y or Z axis, with closed cut faces. The plane is moved with a slider or with the arrow in the view, and can be flipped. The section is saved with the view and shown in the PNG and PDF downloads and in the images of the views.
@@ -214,6 +215,8 @@ document.addEventListener('cad-preview:ready', (event) => {
 | `exportView()` | Returns the current view as an object that can be saved as JSON. 3D models: camera (position, target, up, zoom, clipping planes), projection, viewport aspect, material, lighting, wireframe and background, `section` with the axis, position and direction of the section view (only if the model is cut, e.g. `{"axis": "z", "position": 12.5, "flip": false}`), and `hidden` with the paths of the hidden parts (only if parts are hidden, e.g. `["as1/l-bracket-assembly#2"]`: the names from the model to the part, siblings with the same name numbered). Drawings: `projection: 'drawing'`, center, width of the view and viewport aspect. The object has `version: 1`. |
 | `restoreView(state)` | Restores a view returned by `exportView()`. The viewport should have the saved aspect, otherwise the view is cut or extended. |
 | `setProjection(mode)` | 3D models only: `'perspective'` (default) or `'orthographic'` |
+| `setAxesVisible(visible)` | Shows or hides the world-axis indicator in 3D views; `exportView()` includes its boolean `axes` state. Older views without this field show the axes. |
+| `drawAxes(context, width, height, pixelRatio = 1)` | Composites the visible indicator onto a 2D canvas, e.g. after cropping a custom image. `getRenderContext().canvas` contains only the model. |
 | `getRenderContext()` | Returns `canvas`, `renderer`, `scene` (`null` for drawings) and `render()`, e.g. to create an image of the view |
 
 The canvas has an alpha channel, so a plugin can remove the background (`scene.background = null`) to create images without background.

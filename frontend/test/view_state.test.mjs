@@ -16,6 +16,7 @@ function fixture() {
     },
     setMaterialMode(value) { this.element.dataset.materialMode = value; },
     setLighting(value) { this.element.dataset.lighting = value; },
+    setAxesVisible(value) { this.axesVisible = value; },
     toggleWireframe() { this.wireframe = !this.wireframe; },
     resize() { this.camera.updateProjectionMatrix(); }, render() {}
   };
@@ -60,6 +61,19 @@ test('unsupported camera state version is not applied', () => {
   const camera = viewer.camera;
   assert.throws(() => applyView(viewer, { version: 2 }), /Unsupported/);
   assert.equal(viewer.camera, camera);
+});
+
+test('world axes are visible by default, saved and restored without changing older views', () => {
+  const viewer = fixture();
+  const state = readView(viewer);
+  assert.equal(state.axes, true);
+  viewer.setAxesVisible(false);
+  assert.equal(readView(viewer).axes, false);
+  applyView(viewer, readView(viewer));
+  assert.equal(viewer.axesVisible, false);
+  delete state.axes;
+  applyView(viewer, state);
+  assert.equal(viewer.axesVisible, true);
 });
 
 test('hidden parts are saved only if there are any and restored with the view', () => {

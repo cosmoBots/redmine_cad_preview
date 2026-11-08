@@ -58,6 +58,16 @@
   font-size: 0.9em;
 }
 
+.cad-preview-canvas .cad-preview-world-axes {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(88px, 100%);
+  height: min(88px, 100%);
+  pointer-events: none;
+}
+.cad-preview-canvas .cad-preview-world-axes[hidden] { display: none; }
+
 .cad-preview-canvas {
   position: relative;
   /* The macro sets the height */

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { opaqueBounds, fitSize, sameState, NAME_PATTERN } from '../src/saved_views.js';
+import { opaqueBounds, fitSize, sameState, NAME_PATTERN, captureImage } from '../src/saved_views.js';
 
 // Image data with the given opaque pixels
 function imageData(width, height, opaque) {
@@ -16,6 +16,26 @@ test('bounds of the opaque pixels', () => {
 
 test('transparent image has no bounds', () => {
   assert.equal(opaqueBounds(imageData(4, 4, [])), null);
+});
+
+test('axes are composed after cropping, without enlarging model bounds', () => {
+  const original = globalThis.document;
+  const images = [];
+  globalThis.document = {createElement: () => {
+    const canvas = {width: 0, height: 0};
+    canvas.getContext = () => ({getImageData: () => imageData(100, 80, [[40, 20], [59, 49]]),
+      drawImage: (...args) => images.push(args)});
+    return canvas;
+  }};
+  try {
+    let drawn;
+    const result = captureImage({canvas: {width:100, height:80}, drawTransparent() {},
+      drawAxes(_context, width, height) { drawn = {width, height}; assert.equal(images.length, 1); }});
+    assert.equal(result.width, 20); assert.equal(result.height, 30);
+    assert.deepEqual(drawn, {width:20, height:30});
+    assert.ok(sameState({axes:true}, {}));
+    assert.ok(!sameState({axes:false}, {}));
+  } finally { globalThis.document = original; }
 });
 
 test('size is scaled down to the maximum', () => {
